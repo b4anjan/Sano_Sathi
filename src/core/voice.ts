@@ -2,6 +2,7 @@ import { signal } from '@preact/signals';
 import { voiceOn, volume, hindiFallback, buddy } from './settings';
 import { BUDDIES, type VoiceStyle } from '../content/buddies';
 import { localUrl } from './recordings';
+import { aiClips } from './aiClips';
 import { ITEMS } from '../content/items';
 import { respellForEnglish } from '../content/pronounce';
 
@@ -21,7 +22,7 @@ import { respellForEnglish } from '../content/pronounce';
  * shows the words, unless a grown-up allows the Hindi voice as a stand-in.
  * English: Nepali names are respelled for the English voice (content/pronounce.ts).
  */
-const files = import.meta.glob('../audio/**/*.{m4a,mp3,ogg,wav}', {
+const files = import.meta.glob('../audio/{en,ne}/*.{m4a,mp3,ogg,wav}', {
   eager: true,
   query: '?url',
   import: 'default',
@@ -39,12 +40,23 @@ export const isBundled = (key: string): boolean => key in bundled;
 /** Items whose English name is the Nepali name: English reuses the Nepali clip. */
 const OWN_NAME = new Set(ITEMS.filter((i) => i.ownName).map((i) => i.id));
 
-/** Where to play a clip from: this device's recording, then the bundled file, then an alias. */
+/** AI voice clips for the current buddy (see core/aiClips.ts). */
+export const aiCount = Object.keys(aiClips).length;
+export const isAi = (key: string): boolean => `${buddy.value}/${key}` in aiClips;
+
+/**
+ * Where to play a clip from, best first: this device's recording, a human recording built
+ * into the app, the current buddy's AI voice; then the same for the Nepali name when the
+ * English name is the Nepali word (dhaka topi…).
+ */
+function findClip(key: string): string | undefined {
+  return localUrl(key) ?? bundled[key] ?? aiClips[`${buddy.value}/${key}`];
+}
 export function clipUrl(key: string): string | undefined {
-  const direct = localUrl(key) ?? bundled[key];
+  const direct = findClip(key);
   if (direct) return direct;
   const m = key.match(/^en\/(.+)$/);
-  if (m && OWN_NAME.has(m[1])) return localUrl(`ne/${m[1]}`) ?? bundled[`ne/${m[1]}`];
+  if (m && OWN_NAME.has(m[1])) return findClip(`ne/${m[1]}`);
   return undefined;
 }
 

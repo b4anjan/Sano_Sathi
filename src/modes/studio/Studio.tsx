@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { screen } from '../../core/nav';
 import { localKeys, saveRecording, deleteRecording, deleteAllRecordings, exportZip, importZip } from '../../core/recordings';
-import { isBundled, playKey, stopSpeech } from '../../core/voice';
+import { isAi, isBundled, playKey, stopSpeech } from '../../core/voice';
+import { buddy } from '../../core/settings';
+import { BUDDIES } from '../../content/buddies';
 import { findSpeech, shapeClip, downmix, encodeWav } from '../../core/clipProcess';
 import { scriptFor, GROUPS, type Line, type RecLang } from '../../content/script';
 import { ItemArt, Seg } from '../../ui/common';
@@ -127,7 +129,10 @@ export function Studio() {
   const line = script[Math.min(pos, script.length - 1)];
   const keyOf = (x: Line) => `${rl}/${x.key}`;
   const mine = localKeys.value;
-  const state = (x: Line): 'mine' | 'built' | 'none' => (mine.has(keyOf(x)) ? 'mine' : isBundled(keyOf(x)) ? 'built' : 'none');
+  /** mine = recorded on this device; built = a human recording in the app; ai = the buddy's AI voice; none = computer voice. */
+  const state = (x: Line): 'mine' | 'built' | 'ai' | 'none' =>
+    mine.has(keyOf(x)) ? 'mine' : isBundled(keyOf(x)) ? 'built' : isAi(keyOf(x)) ? 'ai' : 'none';
+  const needsVoice = (x: Line) => { const s = state(x); return s === 'none' || s === 'ai'; };
   const groupLines = script.filter((x) => x.group === line.group);
   const myCount = script.filter((x) => mine.has(keyOf(x))).length;
   const allMine = mine.size;
@@ -202,7 +207,7 @@ export function Studio() {
   const nextMissing = (from = pos) => {
     for (let k = 1; k <= script.length; k++) {
       const j = (from + k) % script.length;
-      if (state(script[j]) === 'none') return j;
+      if (needsVoice(script[j])) return j;
     }
     return -1;
   };
@@ -511,7 +516,7 @@ export function Studio() {
   }
 
   const st = state(line);
-  const recLabel = phase === 'starting' ? 'Starting…' : phase === 'rec' ? 'Stop' : phase === 'saving' ? 'Saving…' : st === 'none' ? 'Record' : 'Record again';
+  const recLabel = phase === 'starting' ? 'Starting…' : phase === 'rec' ? 'Stop' : phase === 'saving' ? 'Saving…' : st === 'none' || st === 'ai' ? 'Record' : 'Record again';
   const busy = phase !== 'idle';
 
   return (
@@ -552,8 +557,8 @@ export function Studio() {
         <div class="seg st-groups" role="group" aria-label="Part of the script">
           {GROUPS.map((g) => {
             const ls = script.filter((x) => x.group === g.id);
-            const done = ls.filter((x) => state(x) !== 'none').length;
-            const first = script.findIndex((x) => x.group === g.id && state(x) === 'none');
+            const done = ls.filter((x) => !needsVoice(x)).length;
+            const first = script.findIndex((x) => x.group === g.id && needsVoice(x));
             return (
               <button
                 key={g.id}
@@ -576,7 +581,13 @@ export function Studio() {
             </div>
             {line.hint && <div class="st-hint">{line.hint}</div>}
             <div class={`st-state ${st}`}>
-              {st === 'mine' ? '✓ Your recording is in use' : st === 'built' ? '★ Built into the app (recording here replaces it on this device)' : 'Not recorded yet'}
+              {st === 'mine'
+                ? '✓ Your recording is in use'
+                : st === 'built'
+                  ? '★ Built into the app (recording here replaces it on this device)'
+                  : st === 'ai'
+                    ? `AI voice (${BUDDIES[buddy.value].name.en}) · press Play to check it, Record to use your own`
+                    : 'Not recorded yet'}
             </div>
           </div>
 

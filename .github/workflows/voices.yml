@@ -1,0 +1,75 @@
+# Makes the AI voices (Azure AI Speech) for every word, letter, number, sentence and buddy line,
+# commits them to src/audio/ai, then redeploys the site.
+#
+# Runs by itself when the app's words change (src/content), or by hand:
+#   GitHub > Actions > "Generate AI voices" > Run workflow.
+# Needs two repository secrets: AZURE_SPEECH_KEY and AZURE_SPEECH_REGION.
+# Only new or changed lines are made, so later runs take a minute or two.
+name: Generate AI voices
+
+on:
+  workflow_dispatch:
+    inputs:
+      buddy:
+        description: Which buddy's voice to make
+        type: choice
+        options: [all, cat, puppy, panda]
+        default: all
+      force:
+        description: Remake every clip (not just new or changed lines)
+        type: boolean
+        default: false
+      limit:
+        description: Make at most this many clips per buddy (0 = no limit; use a small number to test)
+        type: string
+        default: '0'
+  push:
+    branches: [main]
+    paths: ['src/content/**']
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: voices
+  cancel-in-progress: false
+
+jobs:
+  voices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm ci
+      - name: Make voices, one buddy at a time (each buddy is published as soon as it is done)
+        env:
+          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+          AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+          GH_TOKEN: ${{ github.token }}
+          BUDDY: ${{ inputs.buddy || 'all' }}
+          FORCE: ${{ inputs.force && '--force' || '' }}
+          LIMIT: ${{ inputs.limit || '0' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ "$BUDDY" = "all" ]; then LIST="cat puppy panda"; else LIST="$BUDDY"; fi
+          for b in $LIST; do
+            echo "::group::Voices for $b"
+            node scripts/generate-voices.mjs --buddy "$b" --limit "$LIMIT" $FORCE
+            echo "::endgroup::"
+            git add src/audio/ai
+            if git diff --cached --quiet; then
+              echo "No new voices for $b."
+            else
+              git commit -q -m "AI voices: $b"
+              git pull -q --rebase origin main
+              git push -q origin HEAD:main
+              gh workflow run deploy.yml --ref main
+              echo "Published voices for $b."
+            fi
+          done

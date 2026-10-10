@@ -1,6 +1,3 @@
-# MOVE ME: this file belongs at .github/workflows/deploy.yml (PowerShell, in this folder):
-#   New-Item -ItemType Directory -Force .github\workflows; Move-Item deploy-pages.yml .github\workflows\deploy.yml
-#
 # Builds the site and publishes it to GitHub Pages on every push to main.
 # One-time setup: repo Settings > Pages > Build and deployment > Source: "GitHub Actions".
 name: Deploy to GitHub Pages

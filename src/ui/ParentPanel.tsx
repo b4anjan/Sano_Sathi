@@ -8,7 +8,7 @@ import {
 import { totalStars, stickers, resetRewards } from '../core/rewards';
 import { ACTIVITIES } from '../content/activities';
 import { BUDDIES, BUDDY_IDS, type BuddyId } from '../content/buddies';
-import { voiceInfo, clipCount, stopSpeech } from '../core/voice';
+import { voiceInfo, clipCount, aiCount, stopSpeech } from '../core/voice';
 import { localKeys } from '../core/recordings';
 import { unlockAudio } from '../core/audio';
 import { knownCount } from '../core/progress';
@@ -146,7 +146,7 @@ export function ParentPanel() {
           />
         </div>
         <p class="p-small">
-          {neStatus} Clips built into the app: {clipCount}. Recorded on this device: {localKeys.value.size}.
+          {neStatus} AI voice clips: {aiCount}. Human recordings built in: {clipCount}. Recorded on this device: {localKeys.value.size}.
         </p>
         <div class="row">
           <button type="button" class="p-btn" onClick={() => go('studio')}>
