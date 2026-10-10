@@ -46,6 +46,8 @@ jobs:
           node-version: lts/*
           cache: npm
       - run: npm ci
+      - name: Make sure ffmpeg is installed (trims and levels each clip)
+        run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
       - name: Make voices, one buddy at a time (each buddy is published as soon as it is done)
         env:
           AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}

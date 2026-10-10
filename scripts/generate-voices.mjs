@@ -12,9 +12,12 @@
  * are new or changed (--force remakes everything) and removes clips for lines that are gone.
  *
  * The free (F0) tier allows 20 requests a minute, so requests are spaced about 3 s apart.
+ * Each clip is then trimmed (Azure leaves up to a second of silence after a word) and
+ * levelled with ffmpeg, so all clips start promptly and play at the same loudness.
  */
 import { build } from 'esbuild';
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
@@ -35,6 +38,21 @@ const GAP_MS = 3200;
 const SAFE = /^[^\\/:*?"<>|\s]+$/;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const hasFfmpeg = spawnSync('ffmpeg', ['-version'], { stdio: 'ignore' }).status === 0;
+const TRIM =
+  'silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.03,areverse,' +
+  'silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.12,areverse,' +
+  'loudnorm=I=-16:TP=-1.5:LRA=11';
+
+/** Trim silence and level loudness; returns the original audio if ffmpeg is missing or fails. */
+function polish(mp3, tmp) {
+  if (!hasFfmpeg) return mp3;
+  const src = join(tmp, 'in.mp3');
+  const dst = join(tmp, 'out.mp3');
+  writeFileSync(src, mp3);
+  const r = spawnSync('ffmpeg', ['-loglevel', 'error', '-y', '-i', src, '-af', TRIM, '-ar', '24000', '-ac', '1', '-c:a', 'libmp3lame', '-b:a', '48k', dst]);
+  return r.status === 0 && existsSync(dst) ? readFileSync(dst) : mp3;
+}
 const hashOf = (s) => createHash('sha1').update(`${VOICE_VERSION}|${s}`).digest('hex').slice(0, 12);
 
 async function loadJobs() {
@@ -103,6 +121,8 @@ if (dry) {
   process.exit(0);
 }
 
+if (!hasFfmpeg) console.log('Note: ffmpeg not found, so clips are saved without trimming or levelling.');
+const work = mkdtempSync(join(tmpdir(), 'voice-clip-'));
 const key = process.env.AZURE_SPEECH_KEY;
 const region = (process.env.AZURE_SPEECH_REGION || '').trim().toLowerCase();
 if (todo.length && (!key || !region)) {
@@ -127,8 +147,9 @@ for (const p of todo) {
   if (wait > 0) await sleep(wait);
   last = Date.now();
   try {
-    const mp3 = await synth(p.ssml, key, region);
-    if (mp3.length < 500) throw Object.assign(new Error('audio too short'), { skip: true });
+    const raw = await synth(p.ssml, key, region);
+    if (raw.length < 500) throw Object.assign(new Error('audio too short'), { skip: true });
+    const mp3 = polish(raw, work);
     mkdirSync(dirname(fileOf(p.id)), { recursive: true });
     writeFileSync(fileOf(p.id), mp3);
     manifest[p.id] = p.hash;
@@ -159,5 +180,6 @@ if (!limit) {
   }
 }
 save();
+rmSync(work, { recursive: true, force: true });
 console.log(`Made ${made} clips${removed ? `, removed ${removed}` : ''}${skipped.length ? `, skipped ${skipped.length}` : ''}.`);
 for (const s of skipped) console.log(`  skipped ${s}`);

@@ -23,8 +23,8 @@ export const VOICES = {
 export const SLOW_GROUPS = new Set(['words', 'numbers', 'colors', 'letters']);
 const SLOWER = -10;
 
-/** Change this to regenerate every clip after a voice-settings change. */
-export const VOICE_VERSION = 1;
+/** Change this to regenerate every clip after a voice-settings change. (2: trim + level with ffmpeg) */
+export const VOICE_VERSION = 2;
 
 export function escapeXml(s) {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[c]);
