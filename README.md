@@ -132,6 +132,29 @@ Clip keys (the studio handles these for you; they matter only when adding files 
 
 When a game gets a new spoken line, add it to `src/content/script.ts` so the studio asks for it.
 
+## AI voices (Azure AI Speech)
+
+Every line in the Voice Studio script is also spoken by an AI voice, separately for each
+buddy, and built into the app as `src/audio/ai/<buddy>/<lang>/<key>.mp3`:
+
+| Buddy | English | Nepali |
+| --- | --- | --- |
+| Cat | en-US-JennyNeural (cheerful) | ne-NP-HemkalaNeural |
+| Puppy | en-US-AnaNeural (child) | ne-NP-HemkalaNeural, higher pitch |
+| Panda | en-US-GuyNeural (friendly), slower | ne-NP-SagarNeural, slower |
+
+- The GitHub job **Generate AI voices** (`.github/workflows/voices.yml`) makes them with the
+  repository secrets `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION`, commits them and redeploys.
+  It runs by itself when `src/content` changes, or by hand from the Actions tab (choose a
+  buddy, "remake every clip", or a small limit to test).
+- Only new or changed lines are made (`src/audio/ai/manifest.json` keeps a fingerprint of each).
+  Voice settings live in `scripts/voice-ssml.mjs`; bump `VOICE_VERSION` there to remake all.
+- The free Azure tier allows 20 clips a minute: a full run of ~920 clips takes about 50 minutes,
+  and a few new words take seconds. Clips are trimmed and levelled with ffmpeg.
+- Playback order: this device's recording > a human recording built in > the buddy's AI voice >
+  the device's computer voice. Check AI lines in the Voice Studio (they show "AI voice"), and
+  record any word that sounds wrong.
+
 ## Adding a word
 
 1. Add a record to `ITEMS` in `src/content/items.ts`.

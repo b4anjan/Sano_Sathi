@@ -100,7 +100,7 @@ export function ParentPanel() {
               </button>
             ))}
           </div>
-          <p class="p-small">Children can also pick a buddy on the home screen. Each buddy has its own computer voice until you record theirs in the Voice studio (Buddies).</p>
+          <p class="p-small">Children can also pick a buddy on the home screen. Each buddy speaks with its own natural AI voice in both languages. Anything you record in the Voice studio replaces it on this device.</p>
         </fieldset>
 
         <fieldset>
