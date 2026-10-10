@@ -640,7 +640,9 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
   border: 2px solid rgba(29, 42, 40, 0.18); background: transparent; color: var(--ink); text-align: left;
 }
 .p-buddy .art { width: 46px; flex: none; }
-.p-buddy span { display: grid; line-height: 1.15; }
+.p-buddy > span { display: grid; line-height: 1.15; }
+.p-buddy b { white-space: nowrap; }
+.p-buddy b span { font-weight: 700; margin-left: 4px; }
 .p-buddy small { color: var(--ink-soft); font-size: 0.78rem; }
 .p-buddy[aria-pressed='true'] { border-color: var(--ink); background: rgba(29, 42, 40, 0.06); }
 

@@ -3,6 +3,39 @@
 A bilingual English–Nepali learning playground for ages 2–8. One TypeScript codebase:
 the website now, and the iPhone, iPad and Android apps later (wrapped with Capacitor).
 
+## What's inside
+
+**13 activities**, grouped on the home screen:
+
+| Section | Activity | Ages | What it does |
+| --- | --- | --- | --- |
+| Words, letters & numbers | Listen & Find | 2–8 | Hear a word, tap its picture (3 levels) |
+| | Find the Pair | 3–8 | Memory cards: same picture, picture + word, or नेपाली + English |
+| | Letters | 3–7 | Look at ABC, अ आ इ and क ख ग; trace any letter with a finger |
+| | Numbers | 3–7 | 0–20 as felt objects in ten-frames, counted aloud; trace 0–9 and ०–९ |
+| | Count with me | 3–6 | Put oranges on the buddy's plate (five- or ten-frame) |
+| | Shapes & Colors | 2–5 | Drag felt shapes into baskets by colour or shape |
+| Play & explore | Smash & See | 1–6 | Every key or tap makes a letter, number or shape |
+| | Bubble Pop | 2–6 | Pop bubbles; or pop the letter, number or colour asked for |
+| | Xylophone | 2–8 | Sargam and do-re-mi, glide and play tunes |
+| | Felt Paint | 2–8 | Brushes, rainbow brush, sticker stamps, mirror mode, undo |
+| | My Village | 1–6 | A Nepali hillside where everything answers a tap; sun ↔ starry night |
+| Big kids 6–8 | Math Quest | 6–8 | + − × missing-number and compare, 3 levels, keypad, "show me" pictures |
+| | Rupee Shop | 5–8 | Pay with felt coins and notes; level 3 adds "how much change?" |
+
+**Buddies.** The child picks Cat (cheerful female voice), Puppy (little kid voice) or Panda
+(soft, welcoming male voice) on the home screen. The buddy guides every game; tapping it
+plays one of four funny reactions (four quick taps make it giggle). Each buddy has its own
+computer-voice style until a family records its lines in the Voice Studio.
+
+**Stars and stickers.** Right answers and finished rounds earn stars in every game; every
+five stars unlock a felt sticker of one of the app's words, collected in the Sticker book.
+Nothing is ever taken away.
+
+**Grown-ups** (hold the corner tag 2 s, or type `parent`): language, buddy, volume, levels
+for each game, background motion, the children's hold-to-go-home button, sticker reset, and
+the Voice Studio.
+
 ## Run it
 
 ```bash
@@ -39,7 +72,11 @@ Pages is free for public repositories; a private repository needs a paid GitHub 
 
 | Path | What it is |
 | --- | --- |
-| `src/brand.ts` | App name, Nepali name, publisher, mascot, app id. **Rename here only.** |
+| `src/brand.ts` | App name, Nepali name, publisher, default buddy, app id. **Rename here only.** |
+| `src/content/activities.ts` | The list of activities (title, age, colour, section) used by home, rail and panel. |
+| `src/content/buddies.ts` | The three buddies: names, voice styles, hello and tap reactions. |
+| `src/core/rewards.ts` | Stars and stickers. |
+| `src/core/trace.ts` | Scoring for tracing letters and numbers (works for any script). |
 | `src/content/items.ts` | Every word: topic, English, Nepali, romanised. Add a word here. |
 | `src/content/art.ts` | Felt illustrations drawn in code, one function per word. |
 | `src/content/strings.ts` | All child-facing sentences in both languages, for native-speaker review. |
@@ -48,7 +85,7 @@ Pages is free for public repositories; a private repository needs a paid GitHub 
 | `src/content/script.ts` | Everything the Voice Studio asks you to record, in recording order. |
 | `src/content/pronounce.ts` | How the English computer voice should say Nepali names (dhaka topi, Habre…). |
 | `src/core/` | Settings, sound effects, voice, felt texture, learning progress. |
-| `src/modes/` | One folder per mode: `match`, `memory`, `count`, `smash`, `xylo`, plus `studio` (grown-ups). |
+| `src/modes/` | One folder per activity, plus `stickers` and `studio` (grown-ups). |
 | `src/content/letters.ts` | English A–Z and Nepali vowels and consonants (in वर्ग rows) with example words. |
 | `src/ui/Ambient.tsx` | The living background: drifting felt pieces, finger trails, tap bursts. |
 | `src/ui/` | Frame, grown-ups gate, parent panel, home screen, shared pieces. |
@@ -84,9 +121,14 @@ Clip keys (the studio handles these for you; they matter only when adding files 
   (`ownName` in items.ts: dhaka topi, daura suruwal…) are recorded once, in Nepali.
 - Numbers: `num0` … `num10`
 - Letters: `letter-A` … `letter-Z`, `letter-क`, `letter-अ` … (the chant: "क, कुखुराको क")
-- Phrases: `_where`, `_welldone`, `_look`, `_allfound`
-- Sentences: `s-hello`, `s-match`, `s-memory`, `s-count`, `s-smash`, `s-xylo`,
-  `s-tapBasket`, `s-plateFull`, `s-countTogether`, `want-1` … `want-10`
+- Phrases: `_where`, `_welldone`, `_look`, `_allfound`, `_pop`, `_night`, and greetings
+  `_morning`, `_afternoon`, `_evening`, `_late`
+- Sentences: `s-<activity>` (said when an activity opens), `s-tapBasket`, `s-plateFull`,
+  `s-countTogether`, `s-tryAgain`, `want-1` … `want-10`
+- Colours and shapes: `color-red`, `color-sky-blue` …, `shape-circle`, `shape-star` …
+- Buddies: `m-<buddy>-<line>`, e.g. `m-cat-hello`, `m-puppy-bark`, `m-panda-tickle`.
+  Children love recording the Puppy!
+- Village words: `w-house`, `w-himal`, `w-cloud`, `w-pond`, `w-star`
 
 When a game gets a new spoken line, add it to `src/content/script.ts` so the studio asks for it.
 
@@ -96,9 +138,18 @@ When a game gets a new spoken line, add it to `src/content/script.ts` so the stu
 2. Add a picture function to `ART` in `src/content/art.ts` (same id).
 3. `npm test` checks every word has a picture and Nepali text in Devanagari.
 
+## Adding an activity
+
+1. Add an entry to `ACTIVITIES` in `src/content/activities.ts` (and its title to `S` and
+   `SPOKEN_S` in `src/content/strings.ts`).
+2. Write the screen in `src/modes/<id>/` and add it to `src/App.tsx`.
+3. Add its tile picture to `TILE_ART` in `src/ui/Home.tsx`.
+4. Call `award(1)` from `src/core/rewards.ts` when the child succeeds.
+
 ## Next steps
 
-- Trace Lab (letters and numbers in both scripts), Color & Shape Sorting, and Story Time.
+- Story Time and rhymes, with family recordings.
+- Native speaker review of all Nepali text (buddy lines, new activity names, math prompts).
 - Offline install (service worker) and IndexedDB progress.
 - Recordings for the counting praise and hints ("Yum! Three oranges…"), which are still computer voice.
 - Capacitor wrapper: `npx cap add ios` on the MacBook, `npx cap add android` anywhere.

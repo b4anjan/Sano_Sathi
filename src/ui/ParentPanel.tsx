@@ -93,7 +93,7 @@ export function ParentPanel() {
                 <ItemArt id={BUDDIES[id].art} />
                 <span>
                   <b>
-                    {BUDDIES[id].name.en} · <span lang="ne">{BUDDIES[id].name.ne}</span>
+                    {BUDDIES[id].name.en} <span lang="ne">{BUDDIES[id].name.ne}</span>
                   </b>
                   <small>{BUDDIES[id].voiceLabel}</small>
                 </span>

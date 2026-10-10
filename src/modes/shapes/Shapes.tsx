@@ -52,6 +52,8 @@ export function Shapes() {
   const hostRef = useRef<HTMLElement>(null);
   const pieceRef = useRef<HTMLButtonElement>(null);
   const start = useRef<{ x: number; y: number; moved: boolean } | null>(null);
+  /** True between a correct drop and the next piece (or round), so double taps don't count twice. */
+  const busy = useRef(false);
   const timers = useRef<number[]>([]);
   const l = lang.value;
 
@@ -76,10 +78,13 @@ export function Shapes() {
     setPiece(p);
     setSorted({});
     setCount(0);
+    busy.current = false;
     later(() => void say(pieceParts(p, { en: 'Where does it go?', ne: 'कहाँ राख्ने?' })), 400);
   };
 
   useEffect(() => {
+    timers.current.forEach((t) => window.clearTimeout(t));
+    timers.current = [];
     newRound(level);
     return () => {
       timers.current.forEach((t) => window.clearTimeout(t));
@@ -93,7 +98,9 @@ export function Shapes() {
     unlockAudio();
     setDrag(null);
     setHot(null);
+    if (busy.current) return;
     if (bin === binOf(piece)) {
+      busy.current = true;
       const n = count + 1;
       sfx('pop');
       mallet(PENTA[n % PENTA.length], 0.3, 0.8);
@@ -110,7 +117,10 @@ export function Shapes() {
       }
       void say(pieceParts(piece));
       const p = makePiece(round.rule, round.bins);
-      later(() => setPiece(p), 350);
+      later(() => {
+        setPiece(p);
+        busy.current = false;
+      }, 350);
     } else {
       bloop(420, 300, 0.14);
       setBack(true);

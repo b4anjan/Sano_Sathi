@@ -88,7 +88,7 @@ export function Numbers() {
     cheer();
     award(1);
     if (hostRef.current && boardRef.current) burst(hostRef.current, boardRef.current, 24);
-    window.setTimeout(() => void say(numParts(digit, lang.value)), 300);
+    timers.current.push(window.setTimeout(() => void say(numParts(digit, lang.value)), 300));
     timers.current.push(window.setTimeout(() => goDigit(1), 3200));
   };
 
@@ -118,10 +118,10 @@ export function Numbers() {
           </div>
         ) : (
           <div class="kid-tabs" role="group" aria-label="Digits">
-            <button type="button" aria-pressed={script === 'en'} onClick={() => (setScript('en'), setDone(false))}>
+            <button type="button" aria-pressed={script === 'en'} onClick={() => (clear(), setScript('en'), setDone(false))}>
               1 2 3
             </button>
-            <button type="button" aria-pressed={script === 'ne'} class="ne" onClick={() => (setScript('ne'), setDone(false))}>
+            <button type="button" aria-pressed={script === 'ne'} class="ne" onClick={() => (clear(), setScript('ne'), setDone(false))}>
               १ २ ३
             </button>
           </div>
@@ -186,7 +186,7 @@ export function Numbers() {
               <SpeakerIcon />
             </button>
             <TraceMeter value={done ? 1 : cov} />
-            <button type="button" class="pill-btn" onClick={() => (setClearKey((k) => k + 1), setDone(false))}>
+            <button type="button" class="pill-btn" onClick={() => (clear(), setClearKey((k) => k + 1), setDone(false))}>
               <Bi t={{ en: 'Clear', ne: 'मेटाऊ' }} />
             </button>
           </div>

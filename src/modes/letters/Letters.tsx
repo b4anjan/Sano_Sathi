@@ -90,8 +90,10 @@ export function Letters() {
     cheer();
     award(1);
     if (hostRef.current && boardRef.current) burst(hostRef.current, boardRef.current, 24);
-    window.setTimeout(() => speak(L), 300);
-    timer.current = window.setTimeout(() => go(1), 3400);
+    timer.current = window.setTimeout(() => {
+      speak(L);
+      timer.current = window.setTimeout(() => go(1), 3100);
+    }, 300);
   };
 
   const pickSet = (s: SetId) => {
@@ -195,7 +197,7 @@ export function Letters() {
               <SpeakerIcon />
             </button>
             <TraceMeter value={done ? 1 : cov} />
-            <button type="button" class="pill-btn" onClick={() => (setClearKey((k) => k + 1), setDone(false))}>
+            <button type="button" class="pill-btn" onClick={() => (window.clearTimeout(timer.current), setClearKey((k) => k + 1), setDone(false))}>
               <Bi t={{ en: 'Clear', ne: 'मेटाऊ' }} />
             </button>
             {L.art && <ItemArt id={L.art} class="lt-mini" />}

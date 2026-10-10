@@ -79,19 +79,21 @@ export function Village() {
     return () => stopSpeech();
   }, []);
 
+  const resets = useRef<Record<string, number>>({});
+  useEffect(() => () => Object.values(resets.current).forEach((t) => window.clearTimeout(t)), []);
   const hit = (id: string, sound: Sfx, speak = true) => {
     unlockAudio();
     sfx(sound);
     setTapped((t) => ({ ...t, [id]: (t[id] ?? 0) + 1 }));
-    window.setTimeout(() => setTapped((t) => ({ ...t, [id]: 0 })), 1000);
+    window.clearTimeout(resets.current[id]);
+    resets.current[id] = window.setTimeout(() => setTapped((t) => ({ ...t, [id]: 0 })), 1000);
     if (speak) void say(partsFor(id, lang.value));
     taps.current++;
     if (taps.current % 15 === 0) award(1);
   };
 
   const flip = () => {
-    unlockAudio();
-    sfx(night ? 'chime' : 'sparkle');
+    hit('sky', night ? 'chime' : 'sparkle', false);
     setNight((n) => !n);
     const t = night ? { en: 'Good morning!', ne: 'शुभ प्रभात!' } : { en: 'Good night!', ne: 'शुभ रात्रि!' };
     const ne: Part = { text: t.ne, lang: 'ne', clips: [night ? 'ne/_morning' : 'ne/_night'] };

@@ -41,6 +41,7 @@ export function Paint() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const undo = useRef<ImageData[]>([]);
   const pen = useRef<{ x: number; y: number; hue: number } | null>(null);
+  const finger = useRef<number | null>(null);
   const strokes = useRef(0);
   const dpr = Math.min(2, window.devicePixelRatio || 1);
 
@@ -63,14 +64,26 @@ export function Paint() {
       const w = Math.round(wrap.clientWidth * dpr);
       const h = Math.round(wrap.clientHeight * dpr);
       if (cv.width === w && cv.height === h) return;
-      const old = cv.dataset.ready ? cv.getContext('2d')?.getImageData(0, 0, cv.width, cv.height) : null;
+      // Keep the picture when the window or tablet rotates: copy it, then draw it back scaled.
+      let copy: HTMLCanvasElement | null = null;
+      if (cv.dataset.ready && cv.width && cv.height) {
+        copy = document.createElement('canvas');
+        copy.width = cv.width;
+        copy.height = cv.height;
+        copy.getContext('2d')?.drawImage(cv, 0, 0);
+      }
       cv.dataset.ready = '1';
       cv.width = w;
       cv.height = h;
       const c = cv.getContext('2d');
       if (!c) return;
       fillPaper(c, w, h);
-      if (old) c.putImageData(old, 0, 0);
+      if (copy) {
+        const k = Math.min(w / copy.width, h / copy.height);
+        c.drawImage(copy, (w - copy.width * k) / 2, (h - copy.height * k) / 2, copy.width * k, copy.height * k);
+      }
+      undo.current = [];
+      setCanUndo(false);
     };
     resize();
     const ro = new ResizeObserver(resize);
@@ -84,7 +97,7 @@ export function Paint() {
     const cv = cvRef.current;
     if (!c || !cv) return;
     undo.current.push(c.getImageData(0, 0, cv.width, cv.height));
-    if (undo.current.length > 15) undo.current.shift();
+    if (undo.current.length > 6) undo.current.shift();
     setCanUndo(true);
   };
 
@@ -127,6 +140,7 @@ export function Paint() {
 
   const down = (e: PointerEvent) => {
     e.preventDefault();
+    if (finger.current !== null) return;
     unlockAudio();
     setConfirmClear(false);
     (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
@@ -136,13 +150,14 @@ export function Paint() {
       place(p.x, p.y);
       return;
     }
+    finger.current = e.pointerId;
     pen.current = { ...p, hue: Math.random() * 360 };
     line(p.x, p.y, p.x + 0.1, p.y, pen.current.hue);
     mallet(PENTA[Math.floor(Math.random() * PENTA.length)], 0.08, 0.3);
   };
   const move = (e: PointerEvent) => {
     const pn = pen.current;
-    if (!pn) return;
+    if (!pn || e.pointerId !== finger.current) return;
     const p = pos(e);
     const d = Math.hypot(p.x - pn.x, p.y - pn.y);
     if (d < 1.5) return;
@@ -151,7 +166,9 @@ export function Paint() {
     pn.x = p.x;
     pn.y = p.y;
   };
-  const up = () => {
+  const up = (e: PointerEvent) => {
+    if (e.pointerId !== finger.current) return;
+    finger.current = null;
     if (!pen.current) return;
     pen.current = null;
     strokes.current++;

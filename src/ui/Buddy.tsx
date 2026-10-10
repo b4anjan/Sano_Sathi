@@ -15,7 +15,7 @@ export function buddyParts(id: BuddyId, line: string, t: BiText): Part[] {
   return l === 'en' ? [en] : l === 'ne' ? [ne] : [ne, en];
 }
 
-// Reactions cycle in a shuffled order, so the same one never plays twice in a row.
+// Reactions cycle in a shuffled order, so all four play before any repeats.
 const queue: Partial<Record<BuddyId, number[]>> = {};
 function nextReaction(id: BuddyId): Reaction {
   const list = BUDDIES[id].reactions;
@@ -53,6 +53,7 @@ export function Buddy({
   const ref = useRef<HTMLButtonElement>(null);
   const bodyRef = useRef<HTMLSpanElement>(null);
   const [anim, setAnim] = useState('');
+  const [animKey, setAnimKey] = useState(0);
   const [fx, setFx] = useState('');
   const taps = useRef<number[]>([]);
   const fxTimer = useRef<number>();
@@ -84,10 +85,9 @@ export function Buddy({
   }, []);
 
   const play = (name: string, word: string) => {
-    // Restart the animation even when the same one is asked for twice.
-    setAnim('');
-    void bodyRef.current?.offsetWidth;
-    requestAnimationFrame(() => setAnim(name));
+    // A new key remounts the body, so the animation restarts even when it is the same one.
+    setAnim(name);
+    setAnimKey((k) => k + 1);
     setFx(word);
     window.clearTimeout(fxTimer.current);
     fxTimer.current = window.setTimeout(() => setFx(''), 1500);
@@ -123,7 +123,7 @@ export function Buddy({
       onClick={tap}
       aria-label={label ?? `${b.name.en}, ${b.name.ne}`}
     >
-      <span ref={bodyRef} class={`buddy-body${anim ? ` react-${anim}` : ''}`} onAnimationEnd={(e) => e.currentTarget === e.target && setAnim('')}>
+      <span key={animKey} ref={bodyRef} class={`buddy-body${anim ? ` react-${anim}` : ''}`} onAnimationEnd={(e) => e.currentTarget === e.target && setAnim('')}>
         <ItemArt id={b.art} />
       </span>
       {fx && (

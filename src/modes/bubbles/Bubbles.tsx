@@ -79,6 +79,12 @@ export function Bubbles() {
   const nodes = useRef(new Map<number, HTMLElement>());
   const ys = useRef(new Map<number, number>());
   const state = useRef({ bubbles: [] as Bubble[], target: null as Thing | null, mode: 'free' as Mode });
+  const timers = useRef<number[]>([]);
+  const later = (fn: () => void, ms: number) => timers.current.push(window.setTimeout(fn, ms));
+  const clearTimers = () => {
+    timers.current.forEach((t) => window.clearTimeout(t));
+    timers.current = [];
+  };
   state.current = { bubbles, target, mode };
   const l = lang.value;
 
@@ -100,10 +106,12 @@ export function Bubbles() {
     const t = p[Math.floor(Math.random() * p.length)];
     setTarget(t);
     setHits(0);
-    window.setTimeout(() => promptTarget(t), 300);
+    later(() => promptTarget(t), 300);
   };
 
   useEffect(() => {
+    clearTimers();
+    state.current.bubbles = [];
     setBubbles([]);
     ys.current.clear();
     pickTarget(mode);
@@ -165,20 +173,24 @@ export function Bubbles() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  useEffect(() => () => stopSpeech(), []);
+  useEffect(() => () => (clearTimers(), stopSpeech()), []);
 
   const pop = (b: Bubble) => {
     if (b.popped) return;
     unlockAudio();
     sfx('pop');
     setBubbles((bs) => bs.map((x) => (x.id === b.id ? { ...x, popped: true } : x)));
-    window.setTimeout(() => {
+    later(() => {
       ys.current.delete(b.id);
       setBubbles((bs) => bs.filter((x) => x.id !== b.id));
     }, 380);
     const t = state.current.target;
     const lg = lang.value;
     if (t && b.thing.key === t.key) {
+      if (hits >= GOAL) {
+        void say(b.thing.parts(lg));
+        return;
+      }
       const h = hits + 1;
       setHits(h);
       sfx('sparkle');
@@ -186,7 +198,7 @@ export function Bubbles() {
         cheer();
         award(2);
         void say(lg === 'en' ? [{ text: 'Well done!', lang: 'en', clips: ['en/_welldone'] }] : [{ text: 'स्याबास!', lang: 'ne', clips: ['ne/_welldone'] }]);
-        window.setTimeout(() => pickTarget(state.current.mode), 1600);
+        later(() => pickTarget(state.current.mode), 1600);
       } else void say(b.thing.parts(lg));
       return;
     }

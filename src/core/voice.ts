@@ -78,8 +78,8 @@ const byGender: Record<'en' | 'ne' | 'hi', Gendered> = {
   hi: { female: null, male: null },
 };
 // Voice names don't carry a gender field, so we recognise common ones by name.
-const FEMALE = /female|samantha|karen|moira|tessa|victoria|fiona|zira|aria|jenny|hazel|susan|libby|sonia|michelle|emma|ava|allison|kathy|serena|catherine|natasha|clara|google us english|hemkala|swara|kalpana|heera|lekha|neerja|veena/i;
-const MALE = /\bmale|alex|daniel|fred|david|mark|guy|ryan|george|christopher|eric|roger|steffan|sagar|aaron|arthur|rishi|tom\b|oliver|thomas|james|andrew|brian|william|liam|madhur|hemant|prabhat|ravi/i;
+const FEMALE = /\b(female|samantha|karen|moira|tessa|victoria|fiona|zira|aria|jenny|hazel|susan|libby|sonia|michelle|emma|ava|allison|kathy|serena|catherine|natasha|clara|hemkala|swara|kalpana|heera|lekha|neerja|veena)\b|google us english/i;
+const MALE = /\b(male|alex|daniel|fred|david|mark|guy|ryan|george|christopher|eric|roger|steffan|sagar|aaron|arthur|rishi|tom|oliver|thomas|james|andrew|brian|william|liam|madhur|hemant|prabhat|ravi)\b/i;
 
 function gendered(list: SpeechSynthesisVoice[]): Gendered {
   const female = list.find((v) => FEMALE.test(v.name) && !/\bmale/i.test(v.name.replace(/female/i, ''))) ?? null;
@@ -174,7 +174,8 @@ function utter(text: string, v: SpeechSynthesisVoice | null, code: string, style
       } else u.lang = code;
       // When the device has no voice of the buddy's gender, shift the pitch further so
       // the panda still sounds deeper and the puppy still sounds little.
-      const sameGender = !!v && (v === enKid || byGender[code.startsWith('en') ? 'en' : 'ne'][style?.gender ?? 'female'] === v);
+      const g = style?.gender ?? 'female';
+      const sameGender = !!v && (v === enKid || byGender.en[g] === v || byGender.ne[g] === v || byGender.hi[g] === v);
       const pitch = style ? (sameGender ? style.pitch : style.gender === 'male' ? style.pitch - 0.2 : style.pitch) : 1.1;
       u.rate = style?.rate ?? 0.9;
       u.pitch = Math.max(0.1, Math.min(2, pitch));

@@ -56,6 +56,7 @@ export function TraceBoard({
   const mask = useRef<Uint8Array | null>(null);
   const geo = useRef({ side: 0, ox: 0, oy: 0, dpr: 1 });
   const drawing = useRef<{ c: string; pts: Pt[] } | null>(null);
+  const finger = useRef<number | null>(null);
   const passedRef = useRef(false);
   const inkIdx = useRef(0);
   const doneRef = useRef(done);
@@ -209,7 +210,8 @@ export function TraceBoard({
   };
 
   const down = (e: PointerEvent) => {
-    if (doneRef.current) return;
+    if (doneRef.current || finger.current !== null) return;
+    finger.current = e.pointerId;
     e.preventDefault();
     unlockAudio();
     (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
@@ -221,14 +223,16 @@ export function TraceBoard({
   };
   const move = (e: PointerEvent) => {
     const s = drawing.current;
-    if (!s) return;
+    if (!s || e.pointerId !== finger.current) return;
     const p = toPt(e);
     const last = s.pts[s.pts.length - 1];
     if (Math.hypot(p[0] - last[0], p[1] - last[1]) < 0.006) return;
     s.pts.push(p);
     drawInk();
   };
-  const up = () => {
+  const up = (e: PointerEvent) => {
+    if (e.pointerId !== finger.current) return;
+    finger.current = null;
     if (!drawing.current) return;
     drawing.current = null;
     score();
