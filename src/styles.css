@@ -733,15 +733,16 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
 .nb-word .bi { align-items: center; }
 .nb-frames { display: grid; gap: 8px; width: min(100%, 420px); }
 .nb-frame { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; padding: 6px; border-radius: 12px; background: #8a5a33; box-shadow: inset 0 0 0 3px #5e3b1f; }
-.nb-cell { aspect-ratio: 1; border-radius: 8px; background: rgba(255, 255, 255, 0.12); display: grid; place-items: center; padding: 3px; }
-.nb-cell.used { background: rgba(255, 255, 255, 0.28); }
+.nb-cell { aspect-ratio: 1; border-radius: 8px; background: rgba(0, 0, 0, 0.18); display: grid; place-items: center; padding: 3px; }
+.nb-cell.used { background: rgba(255, 255, 255, 0.4); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5); }
 .nb-cell .art { width: 100%; animation: popIn 0.3s cubic-bezier(0.3, 1.6, 0.5, 1); }
 @keyframes popIn { from { transform: scale(0); } to { transform: none; } }
 .nb-row { max-width: calc(var(--k) * 6 + 60px); }
 .calm .nb-cell .art { animation: none; }
 @media (max-width: 760px) {
-  .lt-look { grid-template-columns: 1fr; grid-template-rows: auto auto; overflow-y: auto; }
-  .lt-grid { overflow: visible; }
+  .lt-look { display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+  .lt-card { flex: none; min-height: auto; }
+  .lt-grid { overflow: visible; flex: none; }
   .lt-glyph { font-size: clamp(4rem, 22vw, 6rem); }
   .lt-trace { grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr) auto auto; }
   .lt-board { grid-column: 1 / -1; }
@@ -923,6 +924,7 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
 }
 @media (max-width: 560px) {
   .shop { padding: 4px 12px 10px; }
+  .tray { min-height: 110px; padding: 14px 20px; }
   .goods-name { display: none; }
   .money.coin { width: 60px; height: 60px; }
   .money.coin.big { width: 66px; height: 66px; }

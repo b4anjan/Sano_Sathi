@@ -5,7 +5,7 @@ import { say, stopSpeech, type Part } from '../../core/voice';
 import { award } from '../../core/rewards';
 import { art } from '../../content/art';
 import { itemById } from '../../content/items';
-import type { Bi as BiText } from '../../content/strings';
+import { SCENE_WORDS } from '../../content/script';
 import { Buddy } from '../../ui/Buddy';
 
 /**
@@ -14,15 +14,6 @@ import { Buddy } from '../../ui/Buddy';
  * the sun turns day into a starry night (and the moon turns it back).
  * Tapping says the word in the current language(s), from recordings when they exist.
  */
-
-/** Scene words that are not picture items. Clip key: ne/w-<id>, en/w-<id>. */
-export const SCENE_WORDS: Record<string, BiText> = {
-  house: { en: 'house', ne: 'घर' },
-  himal: { en: 'mountains', ne: 'हिमाल' },
-  cloud: { en: 'cloud', ne: 'बादल' },
-  pond: { en: 'pond', ne: 'पोखरी' },
-  star: { en: 'star', ne: 'तारा' },
-};
 
 interface Obj {
   id: string;
@@ -56,7 +47,7 @@ const STARS: Array<[number, number, number]> = [
 
 function partsFor(id: string, l: string): Part[] {
   const it = itemById(id);
-  const w = it ? { en: it.en, ne: it.ne } : SCENE_WORDS[id];
+  const w = it ? { en: it.en, ne: it.ne } : SCENE_WORDS[id as keyof typeof SCENE_WORDS];
   if (!w) return [];
   const key = it ? id : `w-${id}`;
   const ne: Part = { text: w.ne, lang: 'ne', clips: [`ne/${key}`] };

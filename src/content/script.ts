@@ -2,6 +2,18 @@ import { ITEMS } from './items';
 import { EN_NUM, NE_NUM, neDigits } from './numbers';
 import { EN_LETTERS, NE_VOWELS, NE_CONSONANTS } from './letters';
 import { S, SPOKEN_S, PHRASES, wantText } from './strings';
+import { COLORS, SHAPES } from './shapes';
+import { BUDDIES, BUDDY_IDS, GREETINGS } from './buddies';
+
+/** Scene words in My Village that are not picture items (clip key w-<id>). Kept here so the
+ *  studio and the village agree; the village imports this list. */
+export const SCENE_WORDS = {
+  house: { en: 'house', ne: 'घर' },
+  himal: { en: 'mountains', ne: 'हिमाल' },
+  cloud: { en: 'cloud', ne: 'बादल' },
+  pond: { en: 'pond', ne: 'पोखरी' },
+  star: { en: 'star', ne: 'तारा' },
+};
 
 /**
  * The Voice Studio's script: every line the games can play from a recording, in the
@@ -10,7 +22,7 @@ import { S, SPOKEN_S, PHRASES, wantText } from './strings';
  * When a game gets a new spoken line, add it here too.
  */
 export type RecLang = 'en' | 'ne';
-export type Group = 'words' | 'numbers' | 'sentences' | 'letters';
+export type Group = 'words' | 'numbers' | 'sentences' | 'colors' | 'buddies' | 'letters';
 
 export interface Line {
   /** Clip key without the language, e.g. 'gai', 'num3', '_where', 'want-3', 'letter-क'. */
@@ -28,6 +40,8 @@ export const GROUPS: Array<{ id: Group; en: string; ne: string }> = [
   { id: 'words', en: 'Words', ne: 'शब्द' },
   { id: 'numbers', en: 'Numbers', ne: 'अंक' },
   { id: 'sentences', en: 'Sentences', ne: 'वाक्य' },
+  { id: 'colors', en: 'Colors & shapes', ne: 'रङ र आकार' },
+  { id: 'buddies', en: 'Buddies', ne: 'साथीहरू' },
   { id: 'letters', en: 'Letters', ne: 'अक्षर' },
 ];
 
@@ -60,7 +74,11 @@ export function scriptFor(l: RecLang): Line[] {
     else if (!it.ownName) out.push({ key: it.id, group: 'words', text: it.en, hint: it.ne, art: it.id });
   }
 
-  for (let n = 0; n <= 10; n++) {
+  for (const [id, w] of Object.entries(SCENE_WORDS)) {
+    out.push({ key: `w-${id}`, group: 'words', text: w[l], hint: `My Village · ${l === 'ne' ? w.en : w.ne}` });
+  }
+
+  for (let n = 0; n <= 20; n++) {
     out.push(
       l === 'ne'
         ? { key: `num${n}`, group: 'numbers', text: NE_NUM[n], hint: `${neDigits(n)} · ${n} · ${EN_NUM[n]}` }
@@ -76,10 +94,31 @@ export function scriptFor(l: RecLang): Line[] {
     { key: '_welldone', group: 'sentences', text: PHRASES.welldone[l], hint: 'After a right answer' },
     { key: '_look', group: 'sentences', text: PHRASES.look[l], hint: 'Find the Pair: when the cards are shown' },
     { key: '_allfound', group: 'sentences', text: PHRASES.allfound[l], hint: 'Find the Pair: when every pair is found' },
+    { key: '_pop', group: 'sentences', text: PHRASES.pop[l], hint: l === 'ne' ? 'Bubble Pop: said after the letter, "B फोड!"' : 'Bubble Pop: said before the letter, "Pop… B!"' },
+    { key: '_night', group: 'sentences', text: PHRASES.night[l], hint: 'My Village: when the sun is tapped' },
   );
+  for (const [k, g] of Object.entries(GREETINGS)) {
+    out.push({ key: `_${k}`, group: 'sentences', text: g[l], hint: k === 'late' ? 'Home: after 8 in the evening' : `Home: greeting in the ${k}` });
+  }
   for (const k of SPOKEN_S) out.push({ key: `s-${k}`, group: 'sentences', text: S[k][l], hint: USE_HINT[k] });
   for (let n = 1; n <= 10; n++) {
     out.push({ key: `want-${n}`, group: 'sentences', text: wantText(n)[l], hint: n <= 3 ? 'Counting: level 1 and up' : n <= 5 ? 'Counting: level 2 and up' : 'Counting: level 3' });
+  }
+
+  for (const c of COLORS) {
+    out.push({ key: `color-${c.en.replace(/\s+/g, '-')}`, group: 'colors', text: c[l], hint: `Colour · ${l === 'ne' ? c.en : c.ne}` });
+  }
+  for (const sh of SHAPES) {
+    out.push({ key: `shape-${sh.id}`, group: 'colors', text: sh[l], hint: `Shape · ${l === 'ne' ? sh.en : sh.ne}` });
+  }
+
+  for (const id of BUDDY_IDS) {
+    const b = BUDDIES[id];
+    const who = `${b.name.en} (${b.voiceLabel.toLowerCase()})`;
+    out.push({ key: `m-${id}-hello`, group: 'buddies', text: b.hello[l], hint: `${who} · hello`, art: b.art });
+    for (const r of [...b.reactions, b.tickle]) {
+      out.push({ key: `m-${id}-${r.id}`, group: 'buddies', text: r.say[l], hint: `${who} · when tapped${r.id === 'tickle' ? ' fast' : ''}`, art: b.art });
+    }
   }
 
   if (l === 'ne') {

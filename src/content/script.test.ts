@@ -25,7 +25,7 @@ describe('Voice Studio script', () => {
 
   it('covers the keys the games ask for', () => {
     const ne = new Set(scriptFor('ne').map((x) => x.key));
-    for (const k of ['_where', '_welldone', '_look', '_allfound', 's-hello', 's-match', 'num0', 'num10', 'want-1', 'want-10', 'letter-क', 'letter-अ'])
+    for (const k of ['_where', '_welldone', '_look', '_allfound', '_pop', '_night', '_morning', '_late', 's-match', 's-math', 's-tryAgain', 'num0', 'num20', 'want-1', 'want-10', 'letter-क', 'letter-अ', 'color-red', 'color-sky-blue', 'shape-star', 'w-house', 'm-cat-hello', 'm-puppy-tickle', 'm-panda-munch'])
       expect(ne.has(k), k).toBe(true);
     const en = new Set(scriptFor('en').map((x) => x.key));
     for (const k of ['_where', 'letter-A', 'letter-Z', 'num7']) expect(en.has(k), k).toBe(true);

@@ -182,22 +182,26 @@ export function MathQuest() {
     else setInput((v) => (v.length >= 3 ? v : v === '0' ? k : v + k));
   };
 
-  // Keyboard: digits, Backspace, Enter; < = > for compare.
+  // Keyboard: digits, Backspace, Enter; < = > for compare. The listener is added once and
+  // calls the latest handler through a ref, so a fast typist never hits a stale one.
+  const onKey = (e: KeyboardEvent) => {
+    if (document.querySelector('.panel') || over) return;
+    if (state === 'shown' && (e.key === 'Enter' || e.key === ' ')) return next();
+    if (p.op === 'compare') {
+      if (e.key === '<' || e.key === '>' || e.key === '=') submit(e.key);
+      return;
+    }
+    if (/^[0-9]$/.test(e.key)) key(e.key);
+    else if (e.key === 'Backspace') key('back');
+    else if (e.key === 'Enter') key('ok');
+  };
+  const keyRef = useRef(onKey);
+  keyRef.current = onKey;
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (document.querySelector('.panel') || over) return;
-      if (state === 'shown' && (e.key === 'Enter' || e.key === ' ')) return next();
-      if (p.op === 'compare') {
-        if (e.key === '<' || e.key === '>' || e.key === '=') submit(e.key);
-        return;
-      }
-      if (/^[0-9]$/.test(e.key)) key(e.key);
-      else if (e.key === 'Backspace') key('back');
-      else if (e.key === 'Enter') key('ok');
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  });
+    const h = (e: KeyboardEvent) => keyRef.current(e);
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, []);
 
   const l = lang.value;
   const digits = (s: string) => (l === 'ne' ? s.replace(/\d+/g, (d) => neDigits(Number(d))) : s);

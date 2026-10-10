@@ -489,9 +489,15 @@ export function Studio() {
     }
   };
 
-  // Keyboard shortcuts for recording at a computer.
+  // Keyboard shortcuts for recording at a computer (latest handler via a ref).
+  const keyRef = useRef<(e: KeyboardEvent) => void>(() => undefined);
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
+    const h = (e: KeyboardEvent) => keyRef.current(e);
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, []);
+  {
+    keyRef.current = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || e.metaKey || e.ctrlKey || e.altKey || document.querySelector('.panel')) return;
       const k = e.key.toLowerCase();
@@ -502,9 +508,7 @@ export function Studio() {
       else if (e.key === 'ArrowRight') go(pos + 1);
       else if (e.key === 'ArrowLeft') go(pos - 1);
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  });
+  }
 
   const st = state(line);
   const recLabel = phase === 'starting' ? 'Starting…' : phase === 'rec' ? 'Stop' : phase === 'saving' ? 'Saving…' : st === 'none' ? 'Record' : 'Record again';
