@@ -8,7 +8,7 @@ export const BRAND = {
   appName: 'Sano Sathi',
   appNameNe: 'सानो साथी',
   publisher: 'Mohan Karki', /**'CastronTech', */
-  mascot: { en: 'Haabre', ne: 'हाब्रे' },
+  mascot: { en: 'Cat', ne: 'बिरालो' },
   /** Reverse-DNS id used for the iOS/Android apps later. Must stay stable once published. */
   appId: 'com.castrontech.sanosathi',
   version: '0.3.0',
