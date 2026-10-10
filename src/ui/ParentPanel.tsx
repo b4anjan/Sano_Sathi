@@ -5,6 +5,7 @@ import {
   type Lang, type Level, type Ambient, type Pairs, type MemoryKind,
 } from '../core/settings';
 import { voiceInfo, clipCount, stopSpeech } from '../core/voice';
+import { localKeys } from '../core/recordings';
 import { unlockAudio } from '../core/audio';
 import { knownCount } from '../core/progress';
 import { ITEMS } from '../content/items';
@@ -51,7 +52,7 @@ export function ParentPanel() {
     ? `Nepali voice found: ${v.ne}.`
     : hindiFallback.value && v.hi
       ? `No Nepali voice here; using the Hindi voice (${v.hi}) as a stand-in.`
-      : 'No Nepali computer voice on this device, so Nepali words are shown but not spoken until your recordings are added.';
+      : 'No Nepali computer voice on this device, so Nepali words are shown but not spoken until they are recorded.';
   const ids = ITEMS.map((i) => i.id);
 
   return (
@@ -125,8 +126,14 @@ export function ParentPanel() {
           />
         </div>
         <p class="p-small">
-          {neStatus} Recorded clips in this build: {clipCount}.
+          {neStatus} Clips built into the app: {clipCount}. Recorded on this device: {localKeys.value.size}.
         </p>
+        <div class="row">
+          <button type="button" class="p-btn" onClick={() => go('studio')}>
+            Record voices
+          </button>
+          <span class="p-small">Your own voice, word by word, for proper Nepali (and English) in every game.</span>
+        </div>
         <fieldset>
           <legend>Background</legend>
           <Seg<Ambient>

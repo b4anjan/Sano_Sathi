@@ -5,10 +5,18 @@ import { say, stopSpeech, type Part } from '../../core/voice';
 import { dhakaTile } from '../../content/art';
 import { categoryOf } from '../../content/items';
 import { neDigits } from '../../content/numbers';
+import { PHRASES } from '../../content/strings';
 import { Bi, Habre, ItemArt, burst } from '../../ui/common';
 import { buildDeck, columnsFor, type MCard } from './deck';
 
 const BACK = dhakaTile();
+
+/** A phrase in the current language(s), each with its own recording key. */
+function phrase(l: string, ...names: Array<keyof typeof PHRASES>): Part[] {
+  const ne: Part[] = names.map((n) => ({ text: PHRASES[n].ne, lang: 'ne', clips: [`ne/_${n}`] }));
+  const en: Part[] = names.map((n) => ({ text: PHRASES[n].en, lang: 'en', clips: [`en/_${n}`] }));
+  return l === 'en' ? en : l === 'ne' ? ne : [...ne, ...en];
+}
 
 function cardParts(c: MCard, l: string): Part[] {
   const ne: Part = { text: c.item.ne, lang: 'ne', clips: [`ne/${c.item.id}`] };
@@ -57,7 +65,7 @@ export function Memory() {
     setWon(false);
     if (memoryPeek.value) {
       setPeeking(true);
-      void say(lang.value === 'en' ? [{ text: 'Look!', lang: 'en' }] : lang.value === 'ne' ? [{ text: 'हेर त!', lang: 'ne' }] : [{ text: 'हेर त!', lang: 'ne' }, { text: 'Look!', lang: 'en' }]);
+      void say(phrase(lang.value, 'look'));
       later(() => setPeeking(false), 2600 + d.length * 120);
     } else setPeeking(false);
   };
@@ -97,8 +105,7 @@ export function Memory() {
           setWon(true);
           cheer();
           if (hostRef.current && el) burst(hostRef.current, el, 26);
-          const l = lang.value;
-          void say(l === 'en' ? [{ text: 'Well done! You found them all!', lang: 'en', clips: ['en/_welldone'] }] : l === 'ne' ? [{ text: 'स्याबास! सबै जोडी भेट्यौ!', lang: 'ne', clips: ['ne/_welldone'] }] : [{ text: 'स्याबास! सबै जोडी भेट्यौ!', lang: 'ne', clips: ['ne/_welldone'] }, { text: 'Well done! You found them all!', lang: 'en', clips: ['en/_welldone'] }]);
+          void say(phrase(lang.value, 'welldone', 'allfound'));
         }, 900);
       }
     } else {

@@ -44,24 +44,51 @@ Pages is free for public repositories; a private repository needs a paid GitHub 
 | `src/content/art.ts` | Felt illustrations drawn in code, one function per word. |
 | `src/content/strings.ts` | All child-facing sentences in both languages, for native-speaker review. |
 | `src/content/numbers.ts` | English and Nepali numbers, Nepali digits, counting words (-वटा). |
-| `src/audio/` | Your recordings (see below). Empty until the first recording session. |
+| `src/audio/` | Recordings built into the app (see below). Empty until the first batch is imported. |
+| `src/content/script.ts` | Everything the Voice Studio asks you to record, in recording order. |
+| `src/content/pronounce.ts` | How the English computer voice should say Nepali names (dhaka topi, Habre…). |
 | `src/core/` | Settings, sound effects, voice, felt texture, learning progress. |
-| `src/modes/` | One folder per mode: `match`, `memory`, `count`, `smash`, `xylo`. |
+| `src/modes/` | One folder per mode: `match`, `memory`, `count`, `smash`, `xylo`, plus `studio` (grown-ups). |
 | `src/content/letters.ts` | English A–Z and Nepali vowels and consonants (in वर्ग rows) with example words. |
 | `src/ui/Ambient.tsx` | The living background: drifting felt pieces, finger trails, tap bursts. |
 | `src/ui/` | Frame, grown-ups gate, parent panel, home screen, shared pieces. |
 
-## Adding recordings
+## Voices: from the studio to the app
 
-Put files in `src/audio/<en|ne>/<key>.m4a` (mp3/ogg/wav also work) and rebuild. Nothing else changes.
+Computer voices cannot say Nepali properly, so the app is built around real voices.
 
-- Words: the item id, e.g. `src/audio/ne/gai.m4a`, `src/audio/en/gai.m4a`
-- Numbers: `num1` … `num10`
-- Letters: `letter-A` … `letter-Z` (English), `letter-क` etc. (Nepali)
-- Phrases: `_where` (कहाँ छ? / Where is the…), `_welldone` (स्याबास! / Well done!)
+1. **Record.** On the live site (it must be the https address; preview windows block the
+   microphone), open Grown-ups › **Record voices**. Pick *नेपाली voice* or *English voice*,
+   press **Record**, say the word once. It stops by itself, trims the silence, evens out the
+   volume and plays it back. Every game uses it straight away, on that device.
+2. **Download.** Press **Download all** (or **Share…** on iPhone/iPad) to get
+   `sano-sathi-voices-YYYY-MM-DD.zip`. Keep it: it is also your backup. **Load a zip** puts
+   the same recordings on another phone or tablet.
+3. **Build in.** To give every device (and the beta families) your voices:
+   ```
+   node scripts/import-voices.mjs path\to\sano-sathi-voices-YYYY-MM-DD.zip
+   git add src/audio
+   git commit -m "Add voice recordings"
+   git push
+   ```
+   The script needs ffmpeg (`winget install ffmpeg`). It writes small AAC files to
+   `src/audio/<en|ne>/<key>.m4a`, with rumble removed and loudness levelled.
 
-When every clip a sentence needs exists, the clips play; otherwise the device's computer
-voice is used. Nepali is never read with an English voice.
+Recordings on a device win over built-in ones, which win over the computer voice. If a
+sentence is only partly recorded and there is no computer voice for that language, the
+recorded part still plays (so "गाई" is heard even before "कहाँ छ?" is recorded).
+
+Clip keys (the studio handles these for you; they matter only when adding files by hand):
+
+- Words: the item id, e.g. `ne/gai`, `en/gai`. Words whose English name is the Nepali name
+  (`ownName` in items.ts: dhaka topi, daura suruwal…) are recorded once, in Nepali.
+- Numbers: `num0` … `num10`
+- Letters: `letter-A` … `letter-Z`, `letter-क`, `letter-अ` … (the chant: "क, कुखुराको क")
+- Phrases: `_where`, `_welldone`, `_look`, `_allfound`
+- Sentences: `s-hello`, `s-match`, `s-memory`, `s-count`, `s-smash`, `s-xylo`,
+  `s-tapBasket`, `s-plateFull`, `s-countTogether`, `want-1` … `want-10`
+
+When a game gets a new spoken line, add it to `src/content/script.ts` so the studio asks for it.
 
 ## Adding a word
 
@@ -73,4 +100,5 @@ voice is used. Nepali is never read with an English voice.
 
 - Trace Lab (letters and numbers in both scripts), Color & Shape Sorting, and Story Time.
 - Offline install (service worker) and IndexedDB progress.
+- Recordings for the counting praise and hints ("Yum! Three oranges…"), which are still computer voice.
 - Capacitor wrapper: `npx cap add ios` on the MacBook, `npx cap add android` anywhere.

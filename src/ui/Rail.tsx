@@ -13,6 +13,7 @@ const TITLES = {
   xylo: S.xylo,
   smash: S.smash,
   memory: S.memory,
+  studio: { en: 'Voice studio', ne: 'आवाज स्टुडियो' },
 };
 
 export function openPanel(): void {

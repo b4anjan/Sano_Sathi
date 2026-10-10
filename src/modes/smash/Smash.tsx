@@ -9,6 +9,13 @@ import { SHAPES, COLORS, shapeSVG } from '../../content/shapes';
 import type { Bi as BiText } from '../../content/strings';
 import type { JSX } from 'preact';
 import { Bi } from '../../ui/common';
+import { itemById } from '../../content/items';
+
+/** The letter's word, in the other language, can reuse that item's recording when it is the same word. */
+function glossClip(L: Letter, l: 'en' | 'ne'): string[] | undefined {
+  const it = L.art ? itemById(L.art) : undefined;
+  return it && it[l] === L.gloss ? [`${l}/${it.id}`] : undefined;
+}
 
 type Tab = 'abc' | 'vowels' | 'cons' | 'num';
 interface Spawn {
@@ -89,10 +96,10 @@ export function Smash() {
     const parts: Part[] = [];
     if (script === 'en') {
       parts.push({ text: L.word ? `${L.say}! ${L.say} is for ${L.word}.` : `${L.say}!`, lang: 'en', clips: [`en/letter-${L.ch}`] });
-      if (l !== 'en' && L.gloss) parts.push({ text: L.gloss, lang: 'ne' });
+      if (l !== 'en' && L.gloss) parts.push({ text: L.gloss, lang: 'ne', clips: glossClip(L, 'ne') });
     } else {
       parts.push({ text: L.word ? `${L.ch}, ${L.word}को ${L.ch}` : L.ch, lang: 'ne', clips: [`ne/letter-${L.ch}`] });
-      if (l !== 'ne' && L.gloss) parts.push({ text: L.gloss, lang: 'en' });
+      if (l !== 'ne' && L.gloss) parts.push({ text: L.gloss, lang: 'en', clips: glossClip(L, 'en') });
     }
     speak(parts);
   };

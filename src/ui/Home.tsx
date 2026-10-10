@@ -31,11 +31,12 @@ function FeltName() {
   );
 }
 
-function sayBi(t: BiText) {
+/** Say a sentence in the current language(s); `key` names its recording (ne/<key>, en/<key>). */
+function sayBi(t: BiText, key: string) {
   const l = lang.value;
   const parts = [];
-  if (l !== 'en') parts.push({ text: t.ne, lang: 'ne' as const });
-  if (l !== 'ne') parts.push({ text: t.en, lang: 'en' as const });
+  if (l !== 'en') parts.push({ text: t.ne, lang: 'ne' as const, clips: [`ne/${key}`] });
+  if (l !== 'ne') parts.push({ text: t.en, lang: 'en' as const, clips: [`en/${key}`] });
   void say(parts);
 }
 
@@ -43,7 +44,7 @@ export function Home() {
   const open = (s: Screen, t: BiText) => {
     unlockAudio();
     screen.value = s;
-    sayBi(t);
+    sayBi(t, `s-${s}`);
   };
   const pickLang = (l: Lang) => {
     unlockAudio();
@@ -57,7 +58,7 @@ export function Home() {
           <FeltName />
         </div>
         <div class="greet">
-          <Habre class="habre-home" onTap={() => (unlockAudio(), sayBi(S.hello))} />
+          <Habre class="habre-home" onTap={() => (unlockAudio(), sayBi(S.hello, 's-hello'))} />
           <div class="bubble left">
             <Bi t={S.hello} />
           </div>

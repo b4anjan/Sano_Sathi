@@ -4,7 +4,9 @@
  *
  * `review: true` marks Nepali text a native speaker has not yet confirmed.
  * Culture words (dhaka topi, daura suruwal, doko, madal) keep their Nepali name in
- * English mode too, the way "momo" is used in English.
+ * English mode too, the way "momo" is used in English. `ownName: true` marks items whose
+ * English name *is* the Nepali name: English speech reuses the Nepali recording for them,
+ * so they are recorded once, by a Nepali speaker.
  */
 export type CategoryId = 'animals' | 'produce' | 'clothing' | 'village' | 'nature';
 
@@ -15,6 +17,7 @@ export interface Item {
   ne: string;
   roman: string;
   review?: boolean;
+  ownName?: true;
 }
 
 export interface Category {
@@ -51,10 +54,10 @@ export const ITEMS: Item[] = [
   { id: 'makai', cat: 'produce', en: 'corn', ne: 'मकै', roman: 'makai' },
   { id: 'syau', cat: 'produce', en: 'apple', ne: 'स्याउ', roman: 'syau' },
 
-  { id: 'dhaka-topi', cat: 'clothing', en: 'dhaka topi', ne: 'ढाका टोपी', roman: 'dhaka topi' },
-  { id: 'daura-suruwal', cat: 'clothing', en: 'daura suruwal', ne: 'दौरा सुरुवाल', roman: 'daura suruwal' },
-  { id: 'gunyu-cholo', cat: 'clothing', en: 'gunyu cholo', ne: 'गुन्यु चोलो', roman: 'gunyu cholo', review: true },
-  { id: 'kurtha-suruwal', cat: 'clothing', en: 'kurta suruwal', ne: 'कुर्था सुरुवाल', roman: 'kurtha suruwal', review: true },
+  { id: 'dhaka-topi', cat: 'clothing', en: 'dhaka topi', ne: 'ढाका टोपी', roman: 'dhaka topi', ownName: true },
+  { id: 'daura-suruwal', cat: 'clothing', en: 'daura suruwal', ne: 'दौरा सुरुवाल', roman: 'daura suruwal', ownName: true },
+  { id: 'gunyu-cholo', cat: 'clothing', en: 'gunyu cholo', ne: 'गुन्यु चोलो', roman: 'gunyu cholo', review: true, ownName: true },
+  { id: 'kurtha-suruwal', cat: 'clothing', en: 'kurta suruwal', ne: 'कुर्था सुरुवाल', roman: 'kurtha suruwal', review: true, ownName: true },
   { id: 'chappal', cat: 'clothing', en: 'sandals', ne: 'चप्पल', roman: 'chappal' },
   { id: 'galbandi', cat: 'clothing', en: 'scarf', ne: 'गलबन्दी', roman: 'galbandi', review: true },
 

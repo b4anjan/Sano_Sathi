@@ -3,7 +3,7 @@ import { lang, countLevel } from '../../core/settings';
 import { unlockAudio, mallet, bloop, cheer, PENTA } from '../../core/audio';
 import { say, stopSpeech, type Part } from '../../core/voice';
 import { EN_NUM, NE_NUM, NE_COUNTED, neDigits } from '../../content/numbers';
-import { S, type Bi as BiText } from '../../content/strings';
+import { S, wantText, type Bi as BiText } from '../../content/strings';
 import { BRAND } from '../../brand';
 import { Bi, Habre, ItemArt, Stars, burst } from '../../ui/common';
 
@@ -17,10 +17,6 @@ function parts(t: BiText, clipKey?: string): Part[] {
   return lang.value === 'en' ? [en] : lang.value === 'ne' ? [ne] : [ne, en];
 }
 const numText = (n: number): BiText => ({ en: EN_NUM[n], ne: NE_NUM[n] });
-const want = (t: number): BiText => ({
-  en: `${M.en} wants ${EN_NUM[t]} ${oranges(t)}.`,
-  ne: `${M.ne}लाई ${NE_COUNTED[t]} सुन्तला चाहियो।`,
-});
 
 /**
  * Count with Habre: put oranges from the doko onto a brass thali laid out as a five- or
@@ -54,9 +50,9 @@ export function CountHabre() {
     timers.current = [];
   };
   const later = (fn: () => void, ms: number) => timers.current.push(window.setTimeout(fn, ms));
-  const tell = (t: BiText) => {
+  const tell = (t: BiText, clipKey?: string) => {
     setMsg(t);
-    void say(parts(t));
+    void say(parts(t, clipKey));
   };
 
   const newRound = () => {
@@ -71,7 +67,7 @@ export function CountHabre() {
     setBadges(0);
     setNudge(null);
     setEating(false);
-    tell(want(t));
+    tell(wantText(t), `want-${t}`);
   };
 
   useEffect(() => {
@@ -84,7 +80,7 @@ export function CountHabre() {
 
   // Re-say the current request when the language changes.
   useEffect(() => {
-    if (st.current.target) tell(want(st.current.target));
+    if (st.current.target) tell(wantText(st.current.target), `want-${st.current.target}`);
   }, [lang.value]);
 
   const add = () => {
@@ -94,7 +90,7 @@ export function CountHabre() {
     setBadges(0);
     setNudge(null);
     if (p >= cells) {
-      tell(S.plateFull);
+      tell(S.plateFull, 's-plateFull');
       setNudge('plate');
       return;
     }
@@ -122,7 +118,7 @@ export function CountHabre() {
     if (lk) return;
     unlockAudio();
     if (p === 0) {
-      tell(S.tapBasket);
+      tell(S.tapBasket, 's-tapBasket');
       setNudge('doko');
       return;
     }
@@ -142,7 +138,7 @@ export function CountHabre() {
     // Count together, one orange at a time, then a gentle hint.
     setLocked(true);
     setBadges(0);
-    tell(S.countTogether);
+    tell(S.countTogether, 's-countTogether');
     const step = lang.value === 'both' ? 1300 : 850;
     for (let i = 1; i <= p; i++) {
       later(() => {

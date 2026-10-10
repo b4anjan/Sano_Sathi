@@ -11,6 +11,8 @@ export const BRAND = {
   mascot: { en: 'Cat', ne: 'बिरालो' },
   /** Reverse-DNS id used for the iOS/Android apps later. Must stay stable once published. */
   appId: 'com.castrontech.sanosathi',
-  version: '0.3.0',
-  stage: 'Prototype v3',
+  /** The public web address (used in help text, e.g. "open the app on its own to record"). */
+  siteUrl: 'https://b4anjan.github.io/Sano_Sathi/',
+  version: '0.4.0',
+  stage: 'Prototype v4',
 } as const;

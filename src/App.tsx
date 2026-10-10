@@ -11,6 +11,7 @@ import { Home } from './ui/Home';
 import { ListenMatch } from './modes/match/ListenMatch';
 import { CountHabre } from './modes/count/CountHabre';
 import { Xylophone } from './modes/xylo/Xylophone';
+import { Studio } from './modes/studio/Studio';
 
 export function App() {
   // Typing the word "parent" anywhere opens the grown-ups panel.
@@ -33,7 +34,7 @@ export function App() {
   // attention off the task. Play screens get the full lively board.
   const base: AmbientLevel = calmActive.value ? 'off' : ambient.value;
   const focused = s === 'match' || s === 'count' || s === 'memory';
-  const level: AmbientLevel = focused && base === 'lively' ? 'gentle' : base;
+  const level: AmbientLevel = s === 'studio' ? 'off' : focused && base === 'lively' ? 'gentle' : base;
   return (
     <>
       <FeltDefs />
@@ -48,6 +49,7 @@ export function App() {
             {s === 'xylo' && <Xylophone />}
             {s === 'smash' && <Smash />}
             {s === 'memory' && <Memory />}
+            {s === 'studio' && <Studio />}
           </main>
         </div>
       </div>

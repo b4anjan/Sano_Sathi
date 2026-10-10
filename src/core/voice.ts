@@ -1,17 +1,24 @@
 import { signal } from '@preact/signals';
 import { voiceOn, volume, hindiFallback } from './settings';
+import { localUrl } from './recordings';
+import { ITEMS } from '../content/items';
+import { respellForEnglish } from '../content/pronounce';
 
 /**
  * Voice: recorded clips first, computer speech second.
  *
- * Recordings: drop files into src/audio/<lang>/<key>.m4a (or .mp3), for example
- * src/audio/ne/gai.m4a or src/audio/en/_where.m4a. They are picked up at build time,
- * with no code change. When every clip a phrase needs exists, the clips play; otherwise
- * the phrase falls back to the device's text-to-speech voice.
+ * Clips come from two places, checked in this order:
+ *   1. Recordings made in the Voice Studio on this device (core/recordings.ts).
+ *   2. Files bundled with the app: src/audio/<lang>/<key>.m4a (or .mp3), for example
+ *      src/audio/ne/gai.m4a or src/audio/en/_where.m4a, picked up at build time.
+ * When every clip a phrase needs exists, the clips play; otherwise the phrase is read by
+ * the device's text-to-speech voice; and if there is no voice for that language, whatever
+ * clips do exist still play (hearing "गाई" alone beats silence).
  *
  * Nepali: most phones and computers have no Nepali TTS voice. Rather than read Nepali
  * with an English voice (which would teach wrong pronunciation), the app stays quiet and
  * shows the words, unless a grown-up allows the Hindi voice as a stand-in.
+ * English: Nepali names are respelled for the English voice (content/pronounce.ts).
  */
 const files = import.meta.glob('../audio/**/*.{m4a,mp3,ogg,wav}', {
   eager: true,
@@ -19,12 +26,26 @@ const files = import.meta.glob('../audio/**/*.{m4a,mp3,ogg,wav}', {
   import: 'default',
 }) as Record<string, string>;
 
-export const clips: Record<string, string> = {};
+const bundled: Record<string, string> = {};
 for (const [path, url] of Object.entries(files)) {
   const m = path.match(/audio\/(en|ne)\/(.+)\.(m4a|mp3|ogg|wav)$/);
-  if (m) clips[`${m[1]}/${m[2]}`] = url;
+  if (m) bundled[`${m[1]}/${m[2]}`] = url;
 }
-export const clipCount = Object.keys(clips).length;
+/** Clips built into this version of the app. */
+export const clipCount = Object.keys(bundled).length;
+export const isBundled = (key: string): boolean => key in bundled;
+
+/** Items whose English name is the Nepali name: English reuses the Nepali clip. */
+const OWN_NAME = new Set(ITEMS.filter((i) => i.ownName).map((i) => i.id));
+
+/** Where to play a clip from: this device's recording, then the bundled file, then an alias. */
+export function clipUrl(key: string): string | undefined {
+  const direct = localUrl(key) ?? bundled[key];
+  if (direct) return direct;
+  const m = key.match(/^en\/(.+)$/);
+  if (m && OWN_NAME.has(m[1])) return localUrl(`ne/${m[1]}`) ?? bundled[`ne/${m[1]}`];
+  return undefined;
+}
 
 export type SpeechLang = 'en' | 'ne';
 export interface Part {
@@ -59,7 +80,8 @@ function pickVoices(): void {
   const en = byLang(/^en([-_]|$)/i);
   const prefer = ['Google US English', 'Samantha', 'Microsoft Aria', 'Microsoft Jenny', 'Microsoft Zira', 'Karen'];
   enV = prefer.map((p) => en.find((v) => v.name.includes(p))).find(Boolean) || en.find((v) => v.localService) || en[0] || null;
-  neV = byLang(/^ne([-_]|$)/i)[0] || null;
+  const ne = byLang(/^ne([-_]|$)/i);
+  neV = ne.find((v) => /hemkala/i.test(v.name)) || ne[0] || null;
   hiV = byLang(/^hi([-_]|$)/i)[0] || null;
   voiceInfo.value = { en: enV?.name ?? null, ne: neV?.name ?? null, hi: hiV?.name ?? null };
 }
@@ -88,11 +110,11 @@ export function stopSpeech(): void {
   }
 }
 
-function playClip(url: string): Promise<void> {
+function playClip(url: string, vol = Math.min(1, volume.value + 0.2)): Promise<void> {
   return new Promise((resolve) => {
     const a = new Audio(url);
     current = a;
-    a.volume = Math.min(1, volume.value + 0.2);
+    a.volume = vol;
     const done = () => resolve();
     a.onended = done;
     a.onerror = done;
@@ -111,7 +133,7 @@ function utter(text: string, v: SpeechSynthesisVoice | null, code: string): Prom
       }
     };
     try {
-      const u = new SpeechSynthesisUtterance(text);
+      const u = new SpeechSynthesisUtterance(code.startsWith('en') ? respellForEnglish(text) : text);
       if (v) {
         u.voice = v;
         u.lang = v.lang;
@@ -146,20 +168,35 @@ export async function say(parts: Part[]): Promise<boolean> {
   let audible = false;
   for (const p of parts) {
     if (my !== seq) return audible;
-    const keys = p.clips ?? [];
-    if (keys.length && keys.every((k) => clips[k])) {
-      for (const k of keys) {
+    const urls = (p.clips ?? []).map(clipUrl);
+    const v = p.lang === 'en' ? enV : neV ?? (hindiFallback.value ? hiV : null);
+    const canTts = !!synth && (p.lang === 'en' || !!v);
+    if (urls.length && urls.every(Boolean)) {
+      for (const u of urls) {
         if (my !== seq) return audible;
-        await playClip(clips[k]);
+        await playClip(u!);
       }
       audible = true;
-    } else if (synth) {
-      const v = p.lang === 'en' ? enV : neV ?? (hindiFallback.value ? hiV : null);
-      if (p.lang === 'ne' && !v) continue;
+    } else if (canTts) {
       await utter(p.text, v, p.lang === 'en' ? 'en-US' : 'ne-NP');
       audible = true;
-    }
+    } else if (urls.some(Boolean)) {
+      for (const u of urls) {
+        if (!u) continue;
+        if (my !== seq) return audible;
+        await playClip(u);
+      }
+      audible = true;
+    } else continue;
     await new Promise((r) => setTimeout(r, 140));
   }
   return audible;
+}
+
+/** Play one clip at full volume, ignoring the "spoken words" switch (used by the Voice Studio). */
+export function playKey(key: string): Promise<boolean> {
+  stopSpeech();
+  const u = clipUrl(key);
+  if (!u) return Promise.resolve(false);
+  return playClip(u, 1).then(() => true);
 }

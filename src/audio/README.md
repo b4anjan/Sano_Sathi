@@ -1,10 +1,9 @@
-# Recordings
+# Recordings built into the app
 
-Put clips here and rebuild. Examples:
+Don't hand-copy files here: record in the app (Grown-ups › Record voices), press
+Download all, then run
 
-- ne/gai.m4a, en/gai.m4a (words, named by item id)
-- ne/num1.m4a ... ne/num10.m4a (numbers)
-- ne/_where.m4a, ne/_welldone.m4a (phrases)
-- en/letter-A.m4a, ne/letter-क.m4a (letters)
+    node scripts/import-voices.mjs path/to/sano-sathi-voices-YYYY-MM-DD.zip
 
-See the project README for the full list.
+which writes `ne/<key>.m4a` and `en/<key>.m4a` here. See the project README,
+"Voices: from the studio to the app", for the full list of keys.
