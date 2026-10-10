@@ -32,15 +32,24 @@ export const GROUPS: Array<{ id: Group; en: string; ne: string }> = [
 ];
 
 const USE_HINT: Record<(typeof SPOKEN_S)[number], string> = {
-  hello: 'Home: when the child taps Habre',
   match: 'Said when Listen & Find opens',
   memory: 'Said when Find the Pair opens',
   count: 'Said when counting opens',
   smash: 'Said when Smash & See opens',
   xylo: 'Said when the xylophone opens',
+  letters: 'Said when Letters opens',
+  numbers: 'Said when Numbers opens',
+  math: 'Said when Math Quest opens',
+  shop: 'Said when the Rupee Shop opens',
+  shapes: 'Said when Shapes & Colors opens',
+  bubbles: 'Said when Bubble Pop opens',
+  paint: 'Said when Felt Paint opens',
+  village: 'Said when My Village opens',
+  stickers: 'Said when the sticker book opens',
   tapBasket: 'Counting: when the plate is still empty',
   plateFull: 'Counting: when no more fit',
   countTogether: 'Counting: before counting along',
+  tryAgain: 'After a wrong answer (math, shop)',
 };
 
 export function scriptFor(l: RecLang): Line[] {

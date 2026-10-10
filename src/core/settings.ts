@@ -1,4 +1,6 @@
 import { signal, computed, effect } from '@preact/signals';
+import { BRAND } from '../brand';
+import type { BuddyId } from '../content/buddies';
 
 export type Lang = 'en' | 'ne' | 'both';
 export type Level = 1 | 2 | 3;
@@ -18,6 +20,11 @@ interface Saved {
   memoryPairs: Pairs;
   memoryKind: MemoryKind;
   memoryPeek: boolean;
+  buddy: BuddyId;
+  homeButton: boolean;
+  mathLevel: Level;
+  shopLevel: Level;
+  shapesLevel: Level;
 }
 
 const KEY = 'sanosathi.settings.v1';
@@ -33,6 +40,11 @@ const DEFAULTS: Saved = {
   memoryPairs: 3,
   memoryKind: 'same',
   memoryPeek: true,
+  buddy: BRAND.defaultBuddy as BuddyId,
+  homeButton: true,
+  mathLevel: 1,
+  shopLevel: 1,
+  shapesLevel: 1,
 };
 
 function load(): Saved {
@@ -62,6 +74,13 @@ export const ambient = signal<Ambient>(saved.ambient);
 export const memoryPairs = signal<Pairs>(saved.memoryPairs);
 export const memoryKind = signal<MemoryKind>(saved.memoryKind);
 export const memoryPeek = signal(saved.memoryPeek);
+/** The guide character the child picked. */
+export const buddy = signal<BuddyId>(['cat', 'puppy', 'panda'].includes(saved.buddy) ? saved.buddy : (BRAND.defaultBuddy as BuddyId));
+/** A "hold to go home" button for children (a short tap does nothing, so toddlers rarely trigger it). */
+export const homeButton = signal(saved.homeButton);
+export const mathLevel = signal<Level>(saved.mathLevel);
+export const shopLevel = signal<Level>(saved.shopLevel);
+export const shapesLevel = signal<Level>(saved.shapesLevel);
 
 const reducedMQ = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
 const prefersReduced = signal(!!reducedMQ?.matches);
@@ -81,6 +100,11 @@ effect(() => {
     memoryPairs: memoryPairs.value,
     memoryKind: memoryKind.value,
     memoryPeek: memoryPeek.value,
+    buddy: buddy.value,
+    homeButton: homeButton.value,
+    mathLevel: mathLevel.value,
+    shopLevel: shopLevel.value,
+    shapesLevel: shapesLevel.value,
   };
   try {
     localStorage.setItem(KEY, JSON.stringify(data));

@@ -45,6 +45,8 @@ export const ITEMS: Item[] = [
   { id: 'gainda', cat: 'animals', en: 'rhino', ne: 'गैंडा', roman: 'gainda' },
   { id: 'habre', cat: 'animals', en: 'red panda', ne: 'हाब्रे', roman: 'habre' },
   { id: 'machha', cat: 'animals', en: 'fish', ne: 'माछा', roman: 'machha' },
+  { id: 'biralo', cat: 'animals', en: 'cat', ne: 'बिरालो', roman: 'biralo' },
+  { id: 'kukur', cat: 'animals', en: 'dog', ne: 'कुकुर', roman: 'kukur' },
 
   { id: 'aanp', cat: 'produce', en: 'mango', ne: 'आँप', roman: 'aanp' },
   { id: 'kera', cat: 'produce', en: 'banana', ne: 'केरा', roman: 'kera' },

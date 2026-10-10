@@ -1,7 +1,4 @@
 import type { ComponentChildren } from 'preact';
-import { useEffect, useRef, useState } from 'preact/hooks';
-import { onPointer, pointer } from '../core/pointer';
-import { giggle, unlockAudio } from '../core/audio';
 import { lang } from '../core/settings';
 import type { Bi as BiText } from '../content/strings';
 import { art } from '../content/art';
@@ -31,59 +28,6 @@ export function ItemArt({ id, class: cls = '', label }: { id: string; class?: st
       aria-hidden={label ? undefined : 'true'}
       dangerouslySetInnerHTML={{ __html: art(id) }}
     />
-  );
-}
-
-/**
- * Habre, the red panda guide. His eyes follow the child's finger or mouse,
- * and a tap makes him bounce and giggle before doing the screen's own action.
- */
-export function Habre({ class: cls = '', onTap }: { class?: string; onTap?: () => void }) {
-  const ref = useRef<HTMLButtonElement>(null);
-  const [boing, setBoing] = useState(false);
-
-  useEffect(() => {
-    let raf = 0;
-    const off = onPointer(() => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        const el = ref.current;
-        const look = el?.querySelector('.look');
-        if (!el || !look) return;
-        const r = el.getBoundingClientRect();
-        const dx = pointer.x - (r.left + r.width / 2);
-        const dy = pointer.y - (r.top + r.height / 2);
-        const d = Math.hypot(dx, dy) || 1;
-        const k = Math.min(1, d / 160) * 3.2;
-        look.setAttribute('transform', `translate(${((dx / d) * k).toFixed(2)} ${((dy / d) * k).toFixed(2)})`);
-      });
-    });
-    return () => {
-      off();
-      cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  const tap = () => {
-    unlockAudio();
-    setBoing(false);
-    requestAnimationFrame(() => setBoing(true));
-    giggle();
-    onTap?.();
-  };
-
-  return (
-    <button
-      ref={ref}
-      type="button"
-      class={`habre ${cls}${boing ? ' boing' : ''}`}
-      onClick={tap}
-      onAnimationEnd={(e) => e.animationName === 'boing' && setBoing(false)}
-      aria-label="Habre"
-    >
-      <ItemArt id="habre" />
-    </button>
   );
 }
 

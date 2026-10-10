@@ -5,7 +5,9 @@ import { say, stopSpeech, type Part } from '../../core/voice';
 import { record, type ProgressLang } from '../../core/progress';
 import { CATEGORIES, ITEMS, categoryOf, type CategoryId, type Item } from '../../content/items';
 import { S } from '../../content/strings';
-import { Bi, Habre, ItemArt, Stars, burst } from '../../ui/common';
+import { Bi, ItemArt, Stars, burst } from '../../ui/common';
+import { Buddy } from '../../ui/Buddy';
+import { award } from '../../core/rewards';
 import { buildRound, type Round } from './round';
 
 type Mark = 'right' | 'wrong' | undefined;
@@ -93,6 +95,7 @@ export function ListenMatch() {
       setMarks((m) => ({ ...m, [item.id]: 'right' }));
       record(item.id, langsFor(lang.value), misses === 0);
       setFound((f) => f + 1);
+      award(1);
       cheer();
       if (hostRef.current) burst(hostRef.current, el);
       void say(praiseParts(item, lang.value));
@@ -122,7 +125,7 @@ export function ListenMatch() {
   return (
     <section class="screen match" ref={hostRef} aria-label="Listen and Find">
       <div class="match-top">
-        <Habre class="habre-small" onTap={() => void ask(t)} />
+        <Buddy class="habre-small" react={false} onTap={() => void ask(t)} />
         <button type="button" class="bubble left ask" onClick={() => void ask(t)} aria-label="Hear it again">
           <span class="ear" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z" /></svg>

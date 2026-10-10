@@ -2,20 +2,25 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { panelOpen, screen, type Screen } from '../core/nav';
 import {
   lang, volume, voiceOn, calm, matchLevel, countLevel, hindiFallback, ambient, memoryPairs, memoryKind, memoryPeek,
+  buddy, homeButton, mathLevel, shopLevel, shapesLevel,
   type Lang, type Level, type Ambient, type Pairs, type MemoryKind,
 } from '../core/settings';
+import { totalStars, stickers, resetRewards } from '../core/rewards';
+import { ACTIVITIES } from '../content/activities';
+import { BUDDIES, BUDDY_IDS, type BuddyId } from '../content/buddies';
 import { voiceInfo, clipCount, stopSpeech } from '../core/voice';
 import { localKeys } from '../core/recordings';
 import { unlockAudio } from '../core/audio';
 import { knownCount } from '../core/progress';
 import { ITEMS } from '../content/items';
 import { BRAND } from '../brand';
-import { Seg } from './common';
+import { Seg, ItemArt } from './common';
 
 /** Settings for grown-ups. Opened by the gate; children never see a way in. */
 export function ParentPanel() {
   const closeRef = useRef<HTMLButtonElement>(null);
   const [fsMsg, setFsMsg] = useState('');
+  const [confirmReset, setConfirmReset] = useState(false);
   const close = () => (panelOpen.value = false);
 
   useEffect(() => {
@@ -74,13 +79,28 @@ export function ParentPanel() {
             onPick={go}
             options={[
               { v: 'home', label: 'Home' },
-              { v: 'match', label: 'Listen & Find' },
-              { v: 'memory', label: 'Find the Pair' },
-              { v: 'count', label: `Count with ${BRAND.mascot.en}` },
-              { v: 'smash', label: 'Smash & See' },
-              { v: 'xylo', label: 'Xylophone' },
+              ...ACTIVITIES.map((a) => ({ v: a.id as Screen, label: a.title.en })),
+              { v: 'stickers', label: 'Sticker book' },
             ]}
           />
+        </fieldset>
+
+        <fieldset>
+          <legend>Buddy</legend>
+          <div class="p-buddies">
+            {BUDDY_IDS.map((id: BuddyId) => (
+              <button key={id} type="button" class="p-buddy" aria-pressed={buddy.value === id} onClick={() => (buddy.value = id)}>
+                <ItemArt id={BUDDIES[id].art} />
+                <span>
+                  <b>
+                    {BUDDIES[id].name.en} · <span lang="ne">{BUDDIES[id].name.ne}</span>
+                  </b>
+                  <small>{BUDDIES[id].voiceLabel}</small>
+                </span>
+              </button>
+            ))}
+          </div>
+          <p class="p-small">Children can also pick a buddy on the home screen. Each buddy has its own computer voice until you record theirs in the Voice studio (Buddies).</p>
         </fieldset>
 
         <fieldset>
@@ -197,6 +217,45 @@ export function ParentPanel() {
           </div>
         </fieldset>
         <fieldset>
+          <legend>Math Quest level (ages 6–8)</legend>
+          <Seg<Level>
+            label="Math level"
+            value={mathLevel.value}
+            onPick={(l) => (mathLevel.value = l)}
+            options={[
+              { v: 1, label: '1 · within 10, tables 2 5 10' },
+              { v: 2, label: '2 · within 20, tables 2–5' },
+              { v: 3, label: '3 · within 100, all tables' },
+            ]}
+          />
+        </fieldset>
+        <fieldset>
+          <legend>Rupee Shop level</legend>
+          <Seg<Level>
+            label="Shop level"
+            value={shopLevel.value}
+            onPick={(l) => (shopLevel.value = l)}
+            options={[
+              { v: 1, label: '1 · up to रु 10, coins' },
+              { v: 2, label: '2 · up to रु 30, notes' },
+              { v: 3, label: '3 · up to रु 99, and change' },
+            ]}
+          />
+        </fieldset>
+        <fieldset>
+          <legend>Shapes &amp; Colors level</legend>
+          <Seg<Level>
+            label="Shapes level"
+            value={shapesLevel.value}
+            onPick={(l) => (shapesLevel.value = l)}
+            options={[
+              { v: 1, label: '1 · two colors' },
+              { v: 2, label: '2 · three shapes' },
+              { v: 3, label: '3 · four colors or shapes' },
+            ]}
+          />
+        </fieldset>
+        <fieldset>
           <legend>Counting level</legend>
           <Seg<Level>
             label="Counting level"
@@ -210,7 +269,33 @@ export function ParentPanel() {
           />
         </fieldset>
 
+        <div class="row">
+          <label for="homebtn">Hold-to-go-home button for children</label>
+          <input id="homebtn" type="checkbox" checked={homeButton.value} onChange={(e) => (homeButton.value = (e.target as HTMLInputElement).checked)} />
+        </div>
+        <p class="p-small">A house in the top bar: holding it for one second returns to the home screen. Turn it off to keep a child in one activity.</p>
+
         <div class="p-sep" />
+        <div class="row">
+          <span class="p-small">
+            Stars earned: {totalStars.value} · Stickers: {stickers.value.length} of {ITEMS.length}
+          </span>
+          {!confirmReset ? (
+            <button type="button" class="p-btn ghost" onClick={() => setConfirmReset(true)}>
+              Reset stickers
+            </button>
+          ) : (
+            <span class="st-confirm">
+              Start the sticker book again?
+              <button type="button" class="p-btn danger" onClick={() => (resetRewards(), setConfirmReset(false))}>
+                Reset
+              </button>
+              <button type="button" class="p-btn ghost" onClick={() => setConfirmReset(false)}>
+                Keep
+              </button>
+            </span>
+          )}
+        </div>
         <p class="p-small">
           Words known (right first time twice): English {knownCount(ids, 'en')} of {ids.length} · Nepali {knownCount(ids, 'ne')} of {ids.length}
         </p>

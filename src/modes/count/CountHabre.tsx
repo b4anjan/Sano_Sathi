@@ -4,10 +4,9 @@ import { unlockAudio, mallet, bloop, cheer, PENTA } from '../../core/audio';
 import { say, stopSpeech, type Part } from '../../core/voice';
 import { EN_NUM, NE_NUM, NE_COUNTED, neDigits } from '../../content/numbers';
 import { S, wantText, type Bi as BiText } from '../../content/strings';
-import { BRAND } from '../../brand';
-import { Bi, Habre, ItemArt, Stars, burst } from '../../ui/common';
-
-const M = BRAND.mascot;
+import { Bi, ItemArt, Stars, burst } from '../../ui/common';
+import { Buddy } from '../../ui/Buddy';
+import { award } from '../../core/rewards';
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const oranges = (n: number) => (n === 1 ? 'orange' : 'oranges');
 
@@ -19,8 +18,8 @@ function parts(t: BiText, clipKey?: string): Part[] {
 const numText = (n: number): BiText => ({ en: EN_NUM[n], ne: NE_NUM[n] });
 
 /**
- * Count with Habre: put oranges from the doko onto a brass thali laid out as a five- or
- * ten-frame, then tap Habre to share. A wrong count never fails: Habre counts along with
+ * Count with me: put oranges from the doko onto a brass thali laid out as a five- or
+ * ten-frame, then tap the buddy to share. A wrong count never fails: the buddy counts along with
  * the child, then says how many to add or take away.
  */
 export function CountHabre() {
@@ -132,6 +131,7 @@ export function CountHabre() {
         ne: `मीठो! ${NE_COUNTED[t]} सुन्तला। धन्यवाद!`,
       });
       setStars((s) => s + 1);
+      award(1);
       later(newRound, 3000);
       return;
     }
@@ -151,8 +151,8 @@ export function CountHabre() {
       const d = Math.abs(t - p);
       const more = p < t;
       tell({
-        en: `That's ${EN_NUM[p]}. ${M.en} wants ${EN_NUM[t]}. ${more ? `Let's add ${EN_NUM[d]} more.` : `Let's take ${EN_NUM[d]} away.`}`,
-        ne: `यहाँ ${NE_COUNTED[p]} छ। ${M.ne}लाई ${NE_COUNTED[t]} चाहियो। ${more ? `अझै ${NE_COUNTED[d]} थपौँ।` : `${NE_COUNTED[d]} झिकौँ।`}`,
+        en: `That's ${EN_NUM[p]}. I want ${EN_NUM[t]}. ${more ? `Let's add ${EN_NUM[d]} more.` : `Let's take ${EN_NUM[d]} away.`}`,
+        ne: `यहाँ ${NE_COUNTED[p]} छ। मलाई ${NE_COUNTED[t]} चाहियो। ${more ? `अझै ${NE_COUNTED[d]} थपौँ।` : `${NE_COUNTED[d]} झिकौँ।`}`,
       });
       setNudge(more ? 'doko' : 'plate');
       setLocked(false);
@@ -181,7 +181,7 @@ export function CountHabre() {
   const big = l === 'en' ? String(target) : neDigits(target);
 
   return (
-    <section class="screen count" ref={hostRef} aria-label="Count with Habre">
+    <section class="screen count" ref={hostRef} aria-label="Count with me">
       <div class="count-wrap">
         <div class="pip-col" ref={habreRef}>
           <div class="bubble down want-bubble" aria-live="polite">
@@ -195,9 +195,9 @@ export function CountHabre() {
               </span>
             )}
           </div>
-          <Habre class={`habre-count${placed > 0 && !locked ? ' ready' : ''}${eating ? ' yum' : ''}`} onTap={serve} />
+          <Buddy class={`habre-count${placed > 0 && !locked ? ' ready' : ''}${eating ? ' yum' : ''}`} react={false} onTap={serve} />
           <span class="cta">
-            <Bi t={S.tapHabre} />
+            <Bi t={S.tapMe} />
           </span>
         </div>
 

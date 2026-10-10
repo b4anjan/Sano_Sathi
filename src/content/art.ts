@@ -166,6 +166,47 @@ const habre = () => {
   );
 };
 
+/** Cat (बिरालो) — also the Cat buddy. Tail and eyes are grouped so the buddy can animate them. */
+const biralo = () => {
+  const fur = '#F2A65A';
+  const stripe = '#D9822B';
+  return (
+    `<g class="tail">${L('M86 100 Q114 94 108 64 Q105 52 113 44', fur, 11)}${L('M104 78 L113 76 M107 64 L115 66', stripe, 3)}</g>` +
+    P('M26 54 L28 12 L56 34Z', fur) + P('M32 45 L33 23 L47 35Z', C.rose) +
+    P('M94 54 L92 12 L64 34Z', fur) + P('M88 45 L87 23 L73 35Z', C.rose) +
+    E(60, 68, 41, 34, fur, { st: true }) +
+    L('M60 36 L60 47 M50 38 L52 47 M70 38 L68 47', stripe, 3.5) +
+    L('M20 62 L30 64 M20 70 L29 70', stripe, 3) + L('M100 62 L90 64 M100 70 L91 70', stripe, 3) +
+    E(60, 82, 17, 11, C.cream) +
+    E(39, 78, 6, 3.5, C.rose, { op: 0.65 }) + E(81, 78, 6, 3.5, C.rose, { op: 0.65 }) +
+    `<g class="look"><g class="eyes">` +
+    `<circle cx="46" cy="64" r="7" fill="#7BC46A"/><circle cx="74" cy="64" r="7" fill="#7BC46A"/>${eye(46, 64, 4.6)}${eye(74, 64, 4.6)}</g></g>` +
+    P('M55 75 L65 75 L60 81Z', C.pink) +
+    L('M60 81 Q57 87 51 85 M60 81 Q63 87 69 85', C.ink, 2) +
+    L('M42 80 L18 76 M42 84 L19 87 M78 80 L102 76 M78 84 L101 87', C.ink, 1.3)
+  );
+};
+
+/** Dog (कुकुर) — also the Puppy buddy: floppy ears, eye patch, tongue out. */
+const kukur = () => {
+  const coat = '#C98B4F';
+  const ear = '#7A4A26';
+  return (
+    `<g class="tail">${L('M84 102 Q110 98 110 72', coat, 10)}${E(110, 70, 5, 6, C.white)}</g>` +
+    E(60, 66, 37, 35, coat, { st: true }) +
+    P('M60 33 Q67 50 65 62 Q82 66 81 81 Q77 98 60 98 Q43 98 39 81 Q38 66 55 62 Q53 50 60 33Z', C.white) +
+    E(75, 58, 10, 9, ear, { op: 0.9 }) +
+    `<g class="ears">` +
+    P('M28 38 Q10 42 13 70 Q15 88 29 86 Q38 70 40 47Z', ear) +
+    P('M92 38 Q110 42 107 70 Q105 88 91 86 Q82 70 80 47Z', ear) +
+    `</g>` +
+    `<g class="look"><g class="eyes">${eye(46, 60, 5)}${eye(74, 60, 5)}</g></g>` +
+    E(60, 77, 7.5, 5.5, C.ink) + E(57.5, 75.5, 2.4, 1.6, '#fff', { op: 0.7 }) +
+    L('M60 82 L60 87 M60 87 Q55 92 49 89 M60 87 Q65 92 71 89', C.ink, 2) +
+    P('M55.5 89.5 Q60 104 64.5 89.5Z', C.pink) + L('M60 91 L60 97', '#D2557F', 1.4)
+  );
+};
+
 /* ---------------- Fruits and vegetables / फलफूल र तरकारी ---------------- */
 
 const aanp = () =>
@@ -424,7 +465,7 @@ const laligurans = () => {
 };
 
 export const ART: Record<string, () => string> = {
-  gai, bakhra, kukhura, yak, gainda, habre, machha,
+  gai, bakhra, kukhura, yak, gainda, habre, machha, biralo, kukur,
   aanp, kera, suntala, golbheda, mula, makai, syau,
   'dhaka-topi': dhakaTopi, 'daura-suruwal': dauraSuruwal, 'gunyu-cholo': gunyuCholo,
   'kurtha-suruwal': kurthaSuruwal, chappal, galbandi,

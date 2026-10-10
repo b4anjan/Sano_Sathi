@@ -8,7 +8,8 @@ export const BRAND = {
   appName: 'Sano Sathi',
   appNameNe: 'सानो साथी',
   publisher: 'Mohan Karki', /**'CastronTech', */
-  mascot: { en: 'Cat', ne: 'बिरालो' },
+  /** The buddy a new player starts with: 'cat', 'puppy' or 'panda' (content/buddies.ts). */
+  defaultBuddy: 'cat',
   /** Reverse-DNS id used for the iOS/Android apps later. Must stay stable once published. */
   appId: 'com.castrontech.sanosathi',
   /** The public web address (used in help text, e.g. "open the app on its own to record"). */

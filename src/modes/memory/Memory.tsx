@@ -6,7 +6,9 @@ import { dhakaTile } from '../../content/art';
 import { categoryOf } from '../../content/items';
 import { neDigits } from '../../content/numbers';
 import { PHRASES } from '../../content/strings';
-import { Bi, Habre, ItemArt, burst } from '../../ui/common';
+import { Bi, ItemArt, burst } from '../../ui/common';
+import { Buddy } from '../../ui/Buddy';
+import { award } from '../../core/rewards';
 import { buildDeck, columnsFor, type MCard } from './deck';
 
 const BACK = dhakaTile();
@@ -104,6 +106,7 @@ export function Memory() {
         later(() => {
           setWon(true);
           cheer();
+          award(Math.max(2, Math.round(deck.length / 4)));
           if (hostRef.current && el) burst(hostRef.current, el, 26);
           void say(phrase(lang.value, 'welldone', 'allfound'));
         }, 900);
@@ -134,7 +137,7 @@ export function Memory() {
   return (
     <section class="screen memory" ref={hostRef} aria-label="Find the Pair">
       <div class="mem-top">
-        <Habre class="habre-small" onTap={() => void 0} />
+        <Buddy class="habre-small" />
         <div class="bubble left">
           {peeking ? (
             <Bi t={{ en: 'Look closely… remember!', ne: 'राम्ररी हेर… सम्झ!' }} />

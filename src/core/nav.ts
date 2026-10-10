@@ -1,6 +1,7 @@
 import { signal } from '@preact/signals';
+import type { ActivityId } from '../content/activities';
 
-/** 'studio' is the grown-ups' Voice Studio; children cannot reach it. */
-export type Screen = 'home' | 'match' | 'count' | 'xylo' | 'smash' | 'memory' | 'studio';
+/** 'studio' (Voice Studio) is for grown-ups; 'stickers' is the child's sticker book. */
+export type Screen = 'home' | ActivityId | 'studio' | 'stickers';
 export const screen = signal<Screen>('home');
 export const panelOpen = signal(false);

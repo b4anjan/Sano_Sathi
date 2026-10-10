@@ -1,5 +1,6 @@
 import { signal } from '@preact/signals';
-import { voiceOn, volume, hindiFallback } from './settings';
+import { voiceOn, volume, hindiFallback, buddy } from './settings';
+import { BUDDIES, type VoiceStyle } from '../content/buddies';
 import { localUrl } from './recordings';
 import { ITEMS } from '../content/items';
 import { respellForEnglish } from '../content/pronounce';
@@ -68,6 +69,24 @@ let enV: SpeechSynthesisVoice | null = null;
 let neV: SpeechSynthesisVoice | null = null;
 let hiV: SpeechSynthesisVoice | null = null;
 
+/** Voices by language and gender, so each buddy can sound like itself. */
+type Gendered = { female: SpeechSynthesisVoice | null; male: SpeechSynthesisVoice | null };
+let enKid: SpeechSynthesisVoice | null = null;
+const byGender: Record<'en' | 'ne' | 'hi', Gendered> = {
+  en: { female: null, male: null },
+  ne: { female: null, male: null },
+  hi: { female: null, male: null },
+};
+// Voice names don't carry a gender field, so we recognise common ones by name.
+const FEMALE = /female|samantha|karen|moira|tessa|victoria|fiona|zira|aria|jenny|hazel|susan|libby|sonia|michelle|emma|ava|allison|kathy|serena|catherine|natasha|clara|google us english|hemkala|swara|kalpana|heera|lekha|neerja|veena/i;
+const MALE = /\bmale|alex|daniel|fred|david|mark|guy|ryan|george|christopher|eric|roger|steffan|sagar|aaron|arthur|rishi|tom\b|oliver|thomas|james|andrew|brian|william|liam|madhur|hemant|prabhat|ravi/i;
+
+function gendered(list: SpeechSynthesisVoice[]): Gendered {
+  const female = list.find((v) => FEMALE.test(v.name) && !/\bmale/i.test(v.name.replace(/female/i, ''))) ?? null;
+  const male = list.find((v) => MALE.test(v.name) && !/female/i.test(v.name)) ?? null;
+  return { female, male };
+}
+
 function pickVoices(): void {
   if (!synth) return;
   let all: SpeechSynthesisVoice[] = [];
@@ -83,6 +102,11 @@ function pickVoices(): void {
   const ne = byLang(/^ne([-_]|$)/i);
   neV = ne.find((v) => /hemkala/i.test(v.name)) || ne[0] || null;
   hiV = byLang(/^hi([-_]|$)/i)[0] || null;
+  const enLocalFirst = [...en].sort((a, b) => Number(b.localService) - Number(a.localService));
+  byGender.en = gendered(enLocalFirst);
+  enKid = en.find((v) => /\bana\b|child|kid|junior/i.test(v.name)) ?? null;
+  byGender.ne = gendered(ne);
+  byGender.hi = gendered(byLang(/^hi([-_]|$)/i));
   voiceInfo.value = { en: enV?.name ?? null, ne: neV?.name ?? null, hi: hiV?.name ?? null };
 }
 if (synth) {
@@ -122,7 +146,17 @@ function playClip(url: string, vol = Math.min(1, volume.value + 0.2)): Promise<v
   });
 }
 
-function utter(text: string, v: SpeechSynthesisVoice | null, code: string): Promise<void> {
+/** The current buddy's voice for a language, falling back to whatever voice exists. */
+function voiceFor(l: 'en' | 'ne'): { v: SpeechSynthesisVoice | null; style: VoiceStyle } {
+  const style = BUDDIES[buddy.value].voice;
+  if (l === 'en' && style.kid && enKid) return { v: enKid, style: { ...style, pitch: 1.1 } };
+  if (l === 'en') return { v: byGender.en[style.gender] ?? enV, style };
+  if (neV) return { v: byGender.ne[style.gender] ?? neV, style };
+  if (hindiFallback.value && hiV) return { v: byGender.hi[style.gender] ?? hiV, style };
+  return { v: null, style };
+}
+
+function utter(text: string, v: SpeechSynthesisVoice | null, code: string, style?: VoiceStyle): Promise<void> {
   return new Promise((resolve) => {
     if (!synth) return resolve();
     let finished = false;
@@ -138,8 +172,12 @@ function utter(text: string, v: SpeechSynthesisVoice | null, code: string): Prom
         u.voice = v;
         u.lang = v.lang;
       } else u.lang = code;
-      u.rate = 0.9;
-      u.pitch = 1.1;
+      // When the device has no voice of the buddy's gender, shift the pitch further so
+      // the panda still sounds deeper and the puppy still sounds little.
+      const sameGender = !!v && (v === enKid || byGender[code.startsWith('en') ? 'en' : 'ne'][style?.gender ?? 'female'] === v);
+      const pitch = style ? (sameGender ? style.pitch : style.gender === 'male' ? style.pitch - 0.2 : style.pitch) : 1.1;
+      u.rate = style?.rate ?? 0.9;
+      u.pitch = Math.max(0.1, Math.min(2, pitch));
       u.volume = Math.min(1, volume.value + 0.25);
       u.onend = fin;
       u.onerror = fin;
@@ -169,7 +207,7 @@ export async function say(parts: Part[]): Promise<boolean> {
   for (const p of parts) {
     if (my !== seq) return audible;
     const urls = (p.clips ?? []).map(clipUrl);
-    const v = p.lang === 'en' ? enV : neV ?? (hindiFallback.value ? hiV : null);
+    const { v, style } = voiceFor(p.lang);
     const canTts = !!synth && (p.lang === 'en' || !!v);
     if (urls.length && urls.every(Boolean)) {
       for (const u of urls) {
@@ -178,7 +216,7 @@ export async function say(parts: Part[]): Promise<boolean> {
       }
       audible = true;
     } else if (canTts) {
-      await utter(p.text, v, p.lang === 'en' ? 'en-US' : 'ne-NP');
+      await utter(p.text, v, p.lang === 'en' ? 'en-US' : 'ne-NP', style);
       audible = true;
     } else if (urls.some(Boolean)) {
       for (const u of urls) {
