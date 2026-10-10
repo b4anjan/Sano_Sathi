@@ -54,12 +54,15 @@ export const S = {
   newSticker: { en: 'New sticker!', ne: 'नयाँ स्टिकर!' },
   chooseBuddy: { en: 'Choose your buddy', ne: 'साथी छान' },
   tryAgain: { en: 'Almost! Try again.', ne: 'झन्डै! फेरि कोसिस गर।' },
+  stickerHow: { en: 'Play any game to earn stars. Every 5 stars unlock a new sticker!', ne: 'जुनसुकै खेल खेलेर तारा कमाऊ। हरेक ५ तारामा नयाँ स्टिकर!' },
+  copy: { en: 'Copy Me', ne: 'मेरो नक्कल गर' },
+  copySub: { en: 'Watch the lights, then copy the pattern.', ne: 'बत्ती हेर, अनि त्यस्तै थिच।' },
 } satisfies Record<string, Bi>;
 
 /** Spoken sentences that have their own recording, keyed by clip key (`s-<name>` for S above). */
 export const SPOKEN_S = [
   'match', 'memory', 'count', 'smash', 'xylo', 'letters', 'numbers', 'math', 'shop', 'shapes', 'bubbles', 'paint', 'village', 'stickers',
-  'tapBasket', 'plateFull', 'countTogether', 'tryAgain',
+  'copy', 'tapBasket', 'plateFull', 'countTogether', 'tryAgain', 'stickerHow',
 ] as const;
 
 /** Short phrases the games join to a word. Clip key: `_<name>` (for example ne/_where). */
@@ -70,6 +73,10 @@ export const PHRASES = {
   allfound: { en: 'You found them all!', ne: 'सबै जोडी भेट्यौ!' },
   pop: { en: 'Pop', ne: 'फोड!' },
   night: { en: 'Good night!', ne: 'शुभ रात्रि!' },
+  watch: { en: 'Watch and listen!', ne: 'हेर र सुन!' },
+  yourTurn: { en: 'Your turn!', ne: 'अब तिम्रो पालो!' },
+  levelUp: { en: 'Level complete!', ne: 'तह पूरा भयो!' },
+  oops: { en: 'Oops! Watch again.', ne: 'ओहो! फेरि हेर।' },
 } satisfies Record<string, Bi>;
 
 const oranges = (n: number) => (n === 1 ? 'orange' : 'oranges');

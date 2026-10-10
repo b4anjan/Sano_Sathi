@@ -5,7 +5,7 @@ the website now, and the iPhone, iPad and Android apps later (wrapped with Capac
 
 ## What's inside
 
-**13 activities**, grouped on the home screen:
+**14 activities**, grouped on the home screen:
 
 | Section | Activity | Ages | What it does |
 | --- | --- | --- | --- |
@@ -20,6 +20,7 @@ the website now, and the iPhone, iPad and Android apps later (wrapped with Capac
 | | Xylophone | 2–8 | Sargam and do-re-mi, glide and play tunes |
 | | Felt Paint | 2–8 | Brushes, rainbow brush, sticker stamps, mirror mode, undo |
 | | My Village | 1–6 | A Nepali hillside where everything answers a tap; sun ↔ starry night |
+| | Copy Me | 3–8 | Watch the blocks light up and sing, then copy the pattern; 15 levels (4, 6, then 8 blocks; shapes change from level 6) |
 | Big kids 6–8 | Math Quest | 6–8 | + − × missing-number and compare, 3 levels, keypad, "show me" pictures |
 | | Rupee Shop | 5–8 | Pay with felt coins and notes; level 3 adds "how much change?" |
 
@@ -30,11 +31,26 @@ computer-voice style until a family records its lines in the Voice Studio.
 
 **Stars and stickers.** Right answers and finished rounds earn stars in every game; every
 five stars unlock a felt sticker of one of the app's words, collected in the Sticker book.
-Nothing is ever taken away.
+Nothing is ever taken away. A line at the top of the Sticker book explains this (tap it to hear it).
 
-**Grown-ups** (hold the corner tag 2 s, or type `parent`): language, buddy, volume, levels
-for each game, background motion, the children's hold-to-go-home button, sticker reset, and
-the Voice Studio.
+**Tap music.** Tapping empty felt plays one soft note; every screen has its own instrument
+(bells on home, marimba, kalimba, harp, music box, steel drum, ukulele, piano, vibraphone,
+flute, pan flute, guitar, celesta, sitar, harmonium, xylophone), higher notes nearer the top
+of the screen. Learning games play it more softly; game pieces keep their own sounds. All
+synthesized in `src/core/instruments.ts` (no sound files). Grown-ups can switch it off.
+
+**Every screen size.** Phones get a compact home (slim header, EN / ने / दुवै toggles, buddy
+faces, sticker counter); phones on their side get thinner chrome and side-by-side layouts;
+tile pictures scale with their tile; big monitors and TVs get larger pieces. Tap targets are
+at least 44 px, and text follows the device's text-size setting.
+
+**Install to the home screen.** The site has a web manifest and icons (`public/`), so
+"Add to Home screen" (Android, iPhone, iPad) or "Install" (desktop Chrome/Edge) opens it full
+screen with its own icon. It still needs the internet (no offline mode yet).
+
+**Grown-ups** (hold the corner tag 2 s, or type `parent`): language, buddy, volume, tap
+music, levels for each game (including opening or resetting Copy Me levels), background
+motion, the children's hold-to-go-home button, sticker reset, and the Voice Studio.
 
 ## Run it
 
@@ -88,6 +104,8 @@ Pages is free for public repositories; a private repository needs a paid GitHub 
 | `src/modes/` | One folder per activity, plus `stickers` and `studio` (grown-ups). |
 | `src/content/letters.ts` | English A–Z and Nepali vowels and consonants (in वर्ग rows) with example words. |
 | `src/ui/Ambient.tsx` | The living background: drifting felt pieces, finger trails, tap bursts. |
+| `src/core/tapMusic.ts`, `src/core/instruments.ts` | Tap-anywhere music: which instrument each screen uses, and the synthesized instruments. |
+| `public/` | Home-screen icons and the web manifest (website build only). |
 | `src/ui/` | Frame, grown-ups gate, parent panel, home screen, shared pieces. |
 
 ## Voices: from the studio to the app
@@ -167,12 +185,13 @@ buddy, and built into the app as `src/audio/ai/<buddy>/<lang>/<key>.mp3`:
    `SPOKEN_S` in `src/content/strings.ts`).
 2. Write the screen in `src/modes/<id>/` and add it to `src/App.tsx`.
 3. Add its tile picture to `TILE_ART` in `src/ui/Home.tsx`.
-4. Call `award(1)` from `src/core/rewards.ts` when the child succeeds.
+4. Give it an instrument in `SCREEN_INSTRUMENT` (`src/core/tapMusic.ts`); the test checks no two screens share one.
+5. Call `award(1)` from `src/core/rewards.ts` when the child succeeds.
 
 ## Next steps
 
 - Story Time and rhymes, with family recordings.
 - Native speaker review of all Nepali text (buddy lines, new activity names, math prompts).
-- Offline install (service worker) and IndexedDB progress.
+- Offline mode (service worker) and IndexedDB progress.
 - Recordings for the counting praise and hints ("Yum! Three oranges…"), which are still computer voice.
 - Capacitor wrapper: `npx cap add ios` on the MacBook, `npx cap add android` anywhere.

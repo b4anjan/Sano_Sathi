@@ -30,6 +30,12 @@ export function unlockAudio(): AudioContext | null {
   return ac;
 }
 
+/** The live context and master bus, or null when sound is blocked or the volume is zero. */
+export function audioOut(): { a: AudioContext; out: GainNode } | null {
+  const a = unlockAudio();
+  return a && master && volume.value > 0 ? { a, out: master } : null;
+}
+
 effect(() => {
   const v = volume.value;
   if (ac && master) master.gain.setTargetAtTime(v, ac.currentTime, 0.02);
@@ -91,6 +97,15 @@ export const chime = (): void => {
   mallet(783.99, 0.25, 0.8);
   mallet(1046.5, 0.22, 0.8, 0.12);
 };
+
+/**
+ * Copy Me block voice: a round, soft "beep" that lasts as long as the light is on.
+ * Sine body plus a quiet octave shimmer, so it carries on phone speakers without being shrill.
+ */
+export function beep(freq: number, dur = 0.4, gain = 0.32): void {
+  tone({ path: [[0, freq]], dur, gain, attack: 0.012 });
+  tone({ type: 'triangle', path: [[0, freq * 2]], dur: dur * 0.6, gain: gain * 0.22, attack: 0.012 });
+}
 
 /** Habre's giggle: three quick rising chirps. */
 export const giggle = (): void => [1318.5, 1568, 1760].forEach((f, i) => mallet(f, 0.16, 0.25, i * 0.07));

@@ -14,6 +14,6 @@ export const BRAND = {
   appId: 'com.castrontech.sanosathi',
   /** The public web address (used in help text, e.g. "open the app on its own to record"). */
   siteUrl: 'https://b4anjan.github.io/Sano_Sathi/',
-  version: '0.5.0',
-  stage: 'Prototype v5',
+  version: '0.6.0',
+  stage: 'Prototype v6',
 } as const;

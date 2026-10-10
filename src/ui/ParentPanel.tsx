@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { panelOpen, screen, type Screen } from '../core/nav';
 import {
   lang, volume, voiceOn, calm, matchLevel, countLevel, hindiFallback, ambient, memoryPairs, memoryKind, memoryPeek,
-  buddy, homeButton, mathLevel, shopLevel, shapesLevel,
+  buddy, homeButton, mathLevel, shopLevel, shapesLevel, tapMusic,
   type Lang, type Level, type Ambient, type Pairs, type MemoryKind,
 } from '../core/settings';
 import { totalStars, stickers, resetRewards } from '../core/rewards';
@@ -15,6 +15,8 @@ import { knownCount } from '../core/progress';
 import { ITEMS } from '../content/items';
 import { BRAND } from '../brand';
 import { Seg, ItemArt } from './common';
+import { copyProgress } from '../modes/copy/CopyMe';
+import { LEVELS as COPY_LEVELS } from '../modes/copy/levels';
 
 /** Settings for grown-ups. Opened by the gate; children never see a way in. */
 export function ParentPanel() {
@@ -130,6 +132,10 @@ export function ParentPanel() {
             onInput={(e) => (volume.value = Number((e.target as HTMLInputElement).value) / 100)}
           />
           <output for="vol">{Math.round(volume.value * 100)}%</output>
+        </div>
+        <div class="row">
+          <label for="tapmusic">Tap music: a soft note when the child taps empty felt (a different instrument on every screen)</label>
+          <input id="tapmusic" type="checkbox" checked={tapMusic.value} onChange={(e) => (tapMusic.value = (e.target as HTMLInputElement).checked)} />
         </div>
         <div class="row">
           <label for="voice">Spoken words</label>
@@ -267,6 +273,27 @@ export function ParentPanel() {
               { v: 3, label: '3 · up to 10' },
             ]}
           />
+        </fieldset>
+        <fieldset>
+          <legend>Copy Me levels</legend>
+          <div class="row">
+            <span class="p-small">
+              {copyProgress.value.unlocked} of {COPY_LEVELS} levels open. Levels 1–5 use 4 blocks, 6–10 use 6, 11–15 use 8 (and a mistake starts the level again).
+            </span>
+          </div>
+          <div class="st-actions">
+            <button
+              type="button"
+              class="p-btn ghost"
+              disabled={copyProgress.value.unlocked >= COPY_LEVELS}
+              onClick={() => (copyProgress.value = { ...copyProgress.value, unlocked: COPY_LEVELS })}
+            >
+              Open all levels
+            </button>
+            <button type="button" class="p-btn ghost" disabled={copyProgress.value.unlocked <= 1} onClick={() => (copyProgress.value = { unlocked: 1, level: 1 })}>
+              Start again from level 1
+            </button>
+          </div>
         </fieldset>
 
         <div class="row">

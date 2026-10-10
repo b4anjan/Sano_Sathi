@@ -23,6 +23,7 @@ import { Bubbles } from './modes/bubbles/Bubbles';
 import { Paint } from './modes/paint/Paint';
 import { Village } from './modes/village/Village';
 import { Stickers } from './modes/stickers/Stickers';
+import { CopyMe } from './modes/copy/CopyMe';
 
 export function App() {
   // Typing the word "parent" anywhere opens the grown-ups panel.
@@ -52,7 +53,7 @@ export function App() {
       <FeltDefs />
       <div class="frame">
         <div class="board">
-          <Ambient level={level} tapSound={s === 'home'} />
+          <Ambient level={level} />
           <Rail />
           <main class="stage">
             {s === 'home' && <Home />}
@@ -67,6 +68,7 @@ export function App() {
             {s === 'xylo' && <Xylophone />}
             {s === 'paint' && <Paint />}
             {s === 'village' && <Village />}
+            {s === 'copy' && <CopyMe />}
             {s === 'math' && <MathQuest />}
             {s === 'shop' && <Shop />}
             {s === 'stickers' && <Stickers />}

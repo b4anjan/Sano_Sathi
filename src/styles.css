@@ -16,13 +16,17 @@
   --font-ui: 'Atkinson Hyperlegible', 'Mukta', 'Segoe UI', 'Nirmala UI', system-ui, sans-serif;
   color-scheme: dark;
 }
-html { height: 100%; box-sizing: border-box; }
+/* Text follows the reader's own text-size setting (percent of the browser default), easing
+   down a little on phones so labels fit; everything else is sized in px, cq or vmin units. */
+html { height: 100%; box-sizing: border-box; font-size: clamp(87.5%, 78% + 0.45vw, 100%); }
 *, *::before, *::after { box-sizing: inherit; }
 body {
   height: 100%; margin: 0; overflow: hidden;
   background: var(--wall); color: var(--chalk);
-  font-family: var(--font-ui); font-size: 16px;
-  padding-inline: 16px; padding-block: 14px;
+  font-family: var(--font-ui); font-size: 1rem;
+  --pad-x: 16px; --pad-y: 14px;
+  /* Keep clear of notches and rounded corners when installed to the home screen. */
+  padding: max(var(--pad-y), env(safe-area-inset-top)) max(var(--pad-x), env(safe-area-inset-right)) max(var(--pad-y), env(safe-area-inset-bottom)) max(var(--pad-x), env(safe-area-inset-left));
   -webkit-tap-highlight-color: transparent;
 }
 #app { height: 100%; }
@@ -40,7 +44,7 @@ button { font: inherit; color: inherit; }
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
 }
 .board {
-  height: 100%; display: grid; grid-template-rows: auto 1fr; border-radius: 13px; overflow: hidden; position: relative;
+  height: 100%; display: grid; grid-template-rows: auto 1fr; grid-template-columns: minmax(0, 1fr); border-radius: 13px; overflow: hidden; position: relative;
   background-color: var(--felt);
   background-image: var(--noise), radial-gradient(130% 100% at 50% 35%, transparent 50%, rgba(0, 0, 0, 0.3));
   box-shadow: inset 0 0 0 2px var(--wood-dark), inset 0 6px 14px rgba(0, 0, 0, 0.35);
@@ -106,8 +110,16 @@ button { font: inherit; color: inherit; }
 
 /* ---------- home ---------- */
 .home { overflow-y: auto; padding: 8px 20px 24px; display: grid; align-content: start; gap: 18px; }
-.home-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; }
-.felt-name { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(2.3rem, 6.4vw, 4.4rem); line-height: 0.95; }
+.home-top {
+  display: grid; gap: 14px 24px; align-items: center;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto; grid-template-areas: 'name . greet' 'bar bar sticker';
+}
+.home-name { grid-area: name; min-width: 0; }
+.home-top .greet { grid-area: greet; justify-self: end; }
+.home-top .home-bar { grid-area: bar; }
+.home-top .sticker-btn { grid-area: sticker; justify-self: end; }
+.lang-pick .short, .sb-count { display: none; }
+.felt-name { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(2.3rem, 6.4vw, 4.4rem); line-height: 0.95; white-space: nowrap; }
 .felt-name .fl {
   display: inline-block; background-color: var(--c); background-image: var(--noise);
   -webkit-background-clip: text; background-clip: text; color: transparent;
@@ -416,7 +428,7 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
   .card .art { max-width: min(160px, 22vh); }
 }
 @media (max-width: 560px) {
-  body { padding-inline: 10px; padding-block: 10px; }
+  body { --pad-x: 10px; --pad-y: 10px; }
   .frame { padding: 7px; }
   .rail { gap: 8px; padding-inline: 10px; }
   .gate-text small { display: none; }
@@ -424,7 +436,6 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
   .cards.n3 { --n: 2; }
   .bar kbd { display: none; }
   .bar .nail { width: 9px; height: 9px; margin-left: -4.5px; }
-  .tile-art .art { width: 76px; height: 76px; }
 }
 
 /* ---------- voice studio (grown-ups) ---------- */
@@ -576,7 +587,7 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
   padding: 4px 16px 4px 6px; min-height: 52px; border-radius: 16px; background: var(--paper); color: var(--ink);
   font-family: var(--font-display); font-weight: 700; box-shadow: 0 4px 0 var(--shadow); text-align: left;
 }
-.sticker-btn > span:last-child { display: grid; line-height: 1.05; }
+.sticker-btn .sb-text { display: grid; line-height: 1.05; }
 .sticker-btn small { font-family: var(--font-ui); font-weight: 700; font-size: 0.75rem; color: var(--ink-soft); }
 .sticker-btn-art { width: 44px; transform: rotate(-8deg); filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.2)); }
 .home-sec { display: grid; gap: 10px; }
@@ -652,8 +663,6 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
   .tiles { gap: 10px; }
   .tile { padding: 12px 12px 10px; border-radius: 18px; outline-offset: -7px; }
   .tile p { display: none; }
-  .tile-art { height: 64px; }
-  .tile-art .fl-big { font-size: 44px; }
   .sticker-btn { margin-left: 0; }
   .buddy-pick-label { display: none; }
   .sticker-toast { right: 10px; left: 10px; bottom: 12px; }
@@ -667,6 +676,7 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
   background: rgba(255, 255, 255, 0.1); color: var(--chalk); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.18);
 }
 .kid-tabs button .bi { line-height: 1; }
+.kid-tabs button, .pt-tool { min-width: 44px; justify-content: center; }
 .kid-tabs button[aria-pressed='true'] { background: var(--paper); color: var(--ink); box-shadow: 0 3px 0 var(--shadow); }
 .ico { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .round-btn {
@@ -1037,8 +1047,8 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
 .pt-canvas.mirror::after { content: ''; position: absolute; top: 8px; bottom: 8px; left: 50%; border-left: 2px dashed rgba(29, 42, 40, 0.18); pointer-events: none; }
 @media (max-width: 760px) {
   .pt-tool .bi { display: none; }
-  .pt-tool { padding: 4px 10px; }
-  .pt-color { width: 36px; height: 36px; }
+  .pt-tool { padding: 4px 10px; min-width: 44px; justify-content: center; }
+  .pt-color { width: 40px; height: 40px; }
 }
 
 /* ---------- my village ---------- */
@@ -1079,13 +1089,19 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
 
 /* ---------- sticker book ---------- */
 .stickers { overflow-y: auto; padding: 6px 20px 20px; display: grid; gap: 14px; align-content: start; }
-.sk-head { display: flex; align-items: center; gap: 14px; }
-.sk-head .bubble { display: grid; gap: 4px; }
+.sk-head { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.sk-head .bubble { display: grid; gap: 4px; min-width: 0; }
 .sk-next { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; font-size: 1.1rem; }
 .sk-next i { font-style: normal; color: rgba(29, 42, 40, 0.2); }
 .sk-next i.on { color: var(--yellow); text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2); }
 .sk-next small { margin-left: 8px; font-size: 0.72em; color: var(--ink-soft); }
-.sk-pages { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; align-items: start; }
+.sk-how {
+  appearance: none; border: 0; cursor: pointer; justify-self: start; display: inline-flex; align-items: center; gap: 10px; text-align: left;
+  padding: 8px 16px 8px 12px; border-radius: 14px; background: rgba(255, 255, 255, 0.12); color: var(--chalk);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.18); font-family: var(--font-display); font-weight: 700; font-size: 1.05rem;
+}
+.sk-how .bi .en-sub { color: var(--chalk-soft); }
+.sk-pages { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 16px; align-items: start; }
 .sk-page {
   background-color: var(--tint); background-image: var(--noise); border-radius: 22px; padding: 12px 14px 16px; color: var(--ink);
   box-shadow: 0 6px 0 var(--shadow); outline: 3px dashed rgba(255, 255, 255, 0.7); outline-offset: -9px;
@@ -1106,3 +1122,289 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
 .sk-name { font-family: var(--font-display); font-weight: 700; font-size: 0.8rem; line-height: 1.05; text-align: center; }
 .sk-name .bi { align-items: center; }
 .sk-q { position: absolute; top: 34%; font-family: var(--font-display); font-weight: 800; font-size: 1.8rem; color: rgba(29, 42, 40, 0.35); }
+
+/* ---------- copy me ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.copyme { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 10px; padding: 6px 20px 16px; }
+.cm-top { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; }
+.cm-status { min-width: 0; }
+.cm-progress { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; max-width: 220px; }
+.cm-progress i { width: 16px; height: 16px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); transition: background 0.2s; }
+.cm-progress i.on { background: var(--yellow); box-shadow: 0 2px 0 var(--shadow); }
+.cm-progress i.now { box-shadow: inset 0 0 0 3px var(--yellow); }
+.cm-level { display: inline-flex; align-items: center; gap: 4px; }
+.cm-step {
+  appearance: none; border: 0; cursor: pointer; width: 44px; height: 48px; border-radius: 14px; font-size: 1.8rem; line-height: 1;
+  background: rgba(255, 255, 255, 0.1); color: var(--chalk); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.18);
+}
+.cm-step:disabled { opacity: 0.35; cursor: default; }
+.cm-lv {
+  appearance: none; border: 0; cursor: pointer; min-height: 48px; padding: 4px 14px; border-radius: 14px; display: inline-flex; align-items: center; gap: 8px;
+  background: var(--paper); color: var(--ink); font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; box-shadow: 0 3px 0 var(--shadow);
+}
+.cm-lv .bi { line-height: 1; }
+.cm-band { color: var(--orange); letter-spacing: -1px; }
+.cm-wrap { position: relative; min-height: 0; container: cm / size; display: grid; place-items: center; }
+.cm-grid {
+  --cols: var(--lc); --rows: var(--lr); --gap: clamp(10px, 2.4cqmin, 22px);
+  display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); grid-auto-rows: 1fr; gap: var(--gap);
+  width: min(100cqw, calc(100cqh * var(--cols) / var(--rows)), calc(var(--cols) * 260px)); aspect-ratio: var(--cols) / var(--rows);
+}
+@container cm (max-aspect-ratio: 1 / 1) { .cm-grid { --cols: var(--pc); --rows: var(--pr); } }
+.cm-block {
+  appearance: none; border: 0; padding: 4%; margin: 0; background: rgba(0, 0, 0, 0.12); border-radius: 22%; cursor: pointer;
+  display: grid; place-items: center; min-width: 0; min-height: 0; touch-action: manipulation; position: relative;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.08); transition: background 0.12s;
+}
+.cm-shape { display: block; width: 100%; height: 100%; filter: brightness(0.72) saturate(0.85) drop-shadow(0 6px 0 rgba(0, 0, 0, 0.3)); transition: filter 0.12s, transform 0.12s; animation: popIn 0.32s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.cm-shape .shape { display: block; width: 100%; height: 100%; }
+.cm-grid.live .cm-shape { filter: brightness(0.85) drop-shadow(0 6px 0 rgba(0, 0, 0, 0.3)); }
+.cm-block.lit { background: color-mix(in srgb, var(--c) 30%, transparent); }
+.cm-block.lit .cm-shape { filter: brightness(1.28) saturate(1.1) drop-shadow(0 0 18px var(--c)) drop-shadow(0 0 4px #fff); transform: scale(1.06); }
+.cm-block.wrong .cm-shape { animation: shake 0.45s ease; }
+.cm-over { position: absolute; inset: 0; display: grid; place-items: center; z-index: 4; pointer-events: none; }
+.cm-over > * { pointer-events: auto; }
+.cm-go { font-size: 1.6rem; min-height: 72px; padding: 8px 34px; outline: 3px dashed var(--stitch); outline-offset: -8px; animation: nudge 1.4s ease-in-out infinite; }
+.cm-won {
+  display: grid; justify-items: center; gap: 10px; padding: 18px 24px; border-radius: 24px; background-color: var(--paper); color: var(--ink);
+  box-shadow: 0 8px 0 var(--shadow); text-align: center; font-family: var(--font-display); animation: popIn 0.4s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.cm-won b { font-size: clamp(1.3rem, 3.4vw, 1.9rem); font-weight: 800; }
+.cm-won .bi { align-items: center; }
+.cm-won-stars { color: var(--yellow); font-size: 2.2rem; letter-spacing: 4px; text-shadow: 0 2px 0 rgba(0, 0, 0, 0.25); }
+.cm-won-btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.cm-won-btns .pill-btn { box-shadow: 0 4px 0 var(--shadow), inset 0 0 0 2px rgba(29, 42, 40, 0.15); }
+.cm-picker { position: absolute; inset: 0; z-index: 10; display: grid; place-items: center; padding: 14px; background: rgba(10, 20, 18, 0.55); }
+.cm-picker-card { background: var(--paper); color: var(--ink); border-radius: 22px; padding: 16px 18px 12px; width: min(520px, 100%); box-shadow: 0 8px 0 var(--shadow); max-height: 100%; overflow: auto; }
+.cm-picker-card h2 { margin: 0 0 10px; font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; }
+.cm-picker-card h2 .bi { flex-direction: row; gap: 10px; align-items: baseline; }
+.cm-picker-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.cm-pick {
+  appearance: none; border: 0; cursor: pointer; aspect-ratio: 1; min-height: 48px; border-radius: 16px; display: grid; place-items: center; align-content: center; gap: 0;
+  font-family: var(--font-display); color: var(--ink); background: #fff; box-shadow: 0 3px 0 var(--shadow), inset 0 0 0 3px var(--bc, var(--green));
+}
+.cm-pick.b1 { --bc: var(--green); }
+.cm-pick.b2 { --bc: var(--orange); }
+.cm-pick.b3 { --bc: var(--red); }
+.cm-pick b { font-size: 1.5rem; font-weight: 800; line-height: 1; }
+.cm-pick small { font-size: 0.72rem; color: var(--ink-soft); font-weight: 700; }
+.cm-pick.passed { background: color-mix(in srgb, var(--bc) 22%, #fff); }
+.cm-pick.here { box-shadow: 0 3px 0 var(--shadow), inset 0 0 0 5px var(--ink); }
+.cm-pick.locked { opacity: 0.5; cursor: not-allowed; box-shadow: inset 0 0 0 2px rgba(29, 42, 40, 0.15); }
+.cm-pick.locked b { font-size: 1.1rem; }
+.cm-picker-note { margin: 10px 2px 2px; font-size: 0.9rem; color: var(--ink-soft); }
+.tile-copy { display: grid; grid-template-columns: repeat(2, 34px); gap: 6px; align-self: center; }
+.tile-copy i { width: 34px; height: 34px; border-radius: 9px; background: var(--c); filter: brightness(0.8); box-shadow: 0 3px 0 var(--shadow); outline: 1.5px dashed var(--stitch); outline-offset: -5px; }
+.tile-copy i.on { filter: brightness(1.2) drop-shadow(0 0 8px #fff); }
+.calm .cm-go, .calm .cm-shape, .calm .cm-won { animation: none; }
+.calm .cm-block.lit .cm-shape { transform: none; }
+@media (max-width: 560px) {
+  .copyme { padding: 4px 10px 10px; gap: 8px; }
+  .cm-top { gap: 8px; }
+  .cm-progress { order: 5; flex-basis: 100%; max-width: none; justify-content: center; margin-left: 0; }
+  .cm-progress i { width: 13px; height: 13px; }
+  .cm-level { margin-left: auto; }
+  .cm-lv { padding: 4px 10px; font-size: 0.95rem; }
+}
+
+/* =====================================================================================
+   Every screen size. Phones get a compact home (slim header, short language labels,
+   buddy faces without names, a small sticker counter); short landscape screens get a
+   thinner frame and rail; tile pictures scale with the tile (container queries), so a
+   2-column phone grid never crops them. Tap targets stay at least 44px everywhere.
+   ===================================================================================== */
+.tile { container: tile / inline-size; }
+.tile h3 { font-size: clamp(1rem, 9cqw, 1.45rem); }
+.tile-art { height: clamp(52px, 34cqw, 84px); gap: clamp(3px, 2cqw, 6px); }
+.tile-art .art { width: clamp(34px, 30cqw, 80px); }
+.tile-art .art.small { width: clamp(26px, 18cqw, 56px); }
+.tile-art .fl-big { font-size: clamp(32px, 26cqw, 58px); }
+.tile-shapes { gap: clamp(3px, 2cqw, 6px); }
+.tile-shapes > span { width: clamp(30px, 24cqw, 58px); }
+.tile-shapes > span:nth-child(2) { width: clamp(24px, 19cqw, 46px); }
+.mini-card { width: clamp(28px, 24cqw, 62px); padding: clamp(2px, 1.5cqw, 4px); border-radius: clamp(6px, 4cqw, 10px); }
+.tile-bubbles { gap: clamp(3px, 2cqw, 6px); }
+.tile-bubbles i { width: min(var(--s), calc(var(--n) * 0.55cqw)); height: min(var(--s), calc(var(--n) * 0.55cqw)); font-size: min(calc(var(--s) * 0.45), calc(var(--n) * 0.25cqw)); }
+.mini-bars { height: clamp(48px, 32cqw, 78px); gap: clamp(2px, 1cqw, 3px); }
+.mini-bars i { width: clamp(5px, 3.2cqw, 10px); }
+.tile-paint svg { width: min(120px, 70cqw); height: auto; }
+.tile-coin { width: clamp(38px, 26cqw, 62px); height: clamp(38px, 26cqw, 62px); font-size: clamp(1rem, 10cqw, 1.6rem); }
+.tile-copy { grid-template-columns: repeat(2, clamp(22px, 14cqw, 34px)); gap: clamp(4px, 2.4cqw, 6px); }
+.tile-copy i { width: 100%; height: auto; aspect-ratio: 1; border-radius: 26%; }
+@container tile (max-width: 150px) {
+  .tile .age { font-size: 0.72rem; padding: 1px 8px; }
+}
+
+/* ---------- phones (portrait) ---------- */
+@media (max-width: 599px) {
+  body { --pad-x: 6px; --pad-y: 6px; }
+  .frame { padding: 6px; border-radius: 16px; }
+  .board { border-radius: 11px; }
+  .rail { padding: 7px 8px 2px; }
+  .home { padding: 2px 12px 18px; gap: 12px; }
+  .home-top { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'name sticker' 'greet greet' 'bar bar'; gap: 10px; }
+  .felt-name { font-size: clamp(1.8rem, 9.4vw, 2.5rem); }
+  .felt-name .rest { font-size: 0.42em; margin-top: 0.1em; }
+  .home-top .greet { justify-self: stretch; gap: 14px; max-width: none; }
+  .habre-home { width: clamp(56px, 17vw, 72px); }
+  .bubble.hello { font-size: 1rem; padding: 8px 14px; }
+  .home-bar { gap: 8px; justify-content: space-between; }
+  .lang-pick { gap: 0; flex-wrap: nowrap; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.14); }
+  .lang-pick button { min-height: 44px; min-width: 44px; padding: 4px 11px; font-size: 1rem; background: transparent; box-shadow: none; }
+  .lang-pick button[aria-pressed='true'] { background: var(--paper); box-shadow: 0 2px 0 var(--shadow); }
+  .lang-pick .long { display: none; }
+  .lang-pick .short { display: inline; }
+  .buddy-pick { gap: 5px; flex-wrap: nowrap; }
+  .buddy-chip { width: 48px; min-height: 48px; padding: 3px; justify-content: center; border-radius: 50%; }
+  .buddy-chip .art { width: 40px; }
+  .buddy-chip .bc-name { display: none; }
+  .sticker-btn { min-height: 48px; padding: 4px 12px 4px 6px; gap: 4px; border-radius: 14px; }
+  .sticker-btn-art { width: 34px; }
+  .sticker-btn .sb-text { display: none; }
+  .sb-count { display: inline; font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; line-height: 1; }
+  .sb-count small { font-size: 0.6em; color: var(--ink-soft); }
+  .sec-title { font-size: 1.1rem; margin-top: 2px; }
+  .tiles { gap: 10px; }
+  .parent-note { font-size: 0.85rem; }
+  .bubble { font-size: clamp(0.98rem, 4.4vw, 1.2rem); padding: 8px 14px; }
+  .habre-small { width: clamp(52px, 15vw, 70px); }
+  .sticker-toast { left: 8px; right: 8px; bottom: 8px; }
+}
+
+/* ---------- short landscape screens (phones on their side) ---------- */
+@media (max-height: 500px) {
+  body { --pad-x: 8px; --pad-y: 5px; }
+  .frame { padding: 5px; border-radius: 14px; }
+  .board { border-radius: 10px; }
+  .rail { padding: 5px 10px 0; gap: 10px; }
+  .gate { padding: 3px 12px 3px 3px; }
+  .gate svg { width: 26px; height: 26px; }
+  .gate-text small, .rail-hint { display: none; }
+  .rail-title { font-size: 1rem; }
+  .home { padding: 2px 16px 16px; gap: 10px; }
+  .home-top { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'name greet sticker' 'bar bar bar'; gap: 8px 16px; }
+  .felt-name { font-size: 2rem; }
+  .felt-name .rest { font-size: 0.42em; }
+  .home-top .greet { justify-self: start; gap: 12px; }
+  .habre-home { width: 54px; }
+  .bubble.hello { font-size: 0.95rem; padding: 6px 12px; }
+  .buddy-pick-label { display: none; }
+  .lang-pick button { min-height: 44px; padding: 4px 14px; font-size: 1rem; }
+  .buddy-chip { min-height: 44px; }
+  .buddy-chip .art { width: 34px; }
+  .sticker-btn { min-height: 46px; }
+  .tile { padding: 10px 12px; }
+  .tile p { display: none; }
+  .bubble { font-size: 1rem; padding: 6px 12px; }
+  .habre-small { width: 52px; }
+  .copyme, .shapes, .memory, .letters, .numbers, .paint { padding-top: 2px; padding-bottom: 8px; }
+  .gate { min-height: 40px; }
+}
+@media (max-height: 500px) and (min-width: 700px) {
+  .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+}
+
+/* ---------- very narrow phones: keep the top rail on one line ---------- */
+@media (max-width: 430px) {
+  .lang-tag { display: none; }
+  .rail { gap: 6px; }
+  .gate { gap: 6px; padding: 3px 10px 3px 3px; min-height: 40px; }
+  .gate svg { width: 26px; height: 26px; }
+  .gate-text b { font-size: 0.8rem; }
+  .rail-title { font-size: 1rem; }
+  .kid-tabs button { min-width: 44px; justify-content: center; }
+}
+
+/* ---------- short landscape: per-screen layouts that fit without scrolling ---------- */
+@media (max-height: 500px) {
+  .kid-tabs button { min-height: 44px; padding: 4px 12px; font-size: 0.98rem; }
+  /* Listen & Find: the question and the topics share one row; cards sized to the height */
+  .match { grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: 'top cats' 'cards cards' 'foot foot'; gap: 6px 14px; padding: 2px 16px 4px; }
+  .match-top { grid-area: top; gap: 10px; }
+  .cats { grid-area: cats; align-self: center; }
+  .cards { grid-area: cards; }
+  .match-foot { grid-area: foot; min-height: 0; font-size: 0.9rem; }
+  .card { padding: 8px 10px 6px; gap: 2px; }
+  .card .art { max-width: min(230px, 32vh); }
+  .card-name { min-height: 0; font-size: 1rem; }
+  /* Math Quest: one row of operation buttons; the number pad sits beside the question */
+  .mathq { gap: 6px; padding: 2px 16px 8px; }
+  .mq-top { flex-wrap: nowrap; gap: 8px; }
+  .mq-ops { flex-wrap: nowrap; gap: 6px; }
+  .mq-op-btn { padding-right: 4px; min-height: 46px; }
+  .mq-op-btn .bi { display: none; }
+  .mq-op-btn b { width: 38px; height: 38px; }
+  .mq-main { grid-template-columns: auto minmax(0, 1fr); gap: 12px; }
+  .mq-side { grid-auto-flow: row; padding-top: 0; }
+  .mq-side .habre-small { width: 52px; }
+  .mq-center { grid-template-columns: minmax(0, 1fr) auto; align-items: center; justify-items: stretch; gap: 12px; }
+  .mq-card { padding: 10px 14px 12px; gap: 8px; }
+  .mq-eq { font-size: clamp(2rem, 11vh, 3.4rem); }
+  .mq-pad { grid-template-columns: repeat(3, 54px); gap: 7px; }
+  .mq-key { font-size: 1.45rem; border-radius: 14px; }
+  .mq-signs { flex-direction: column; gap: 8px; }
+  .mq-sign { min-width: 90px; padding: 4px 12px; }
+  .mq-sign b { font-size: 2rem; }
+  .mq-actions { grid-column: 1 / -1; justify-content: center; }
+  /* Rupee Shop: slimmer stall and tray */
+  .shop { gap: 8px; padding: 2px 16px 8px; }
+  .awning { height: 20px; }
+  .shelf { padding: 6px 12px 8px; }
+  .goods .art { width: clamp(44px, 14vh, 70px); }
+  .goods-name { display: none; }
+  .tray { min-height: 92px; padding: 10px 22px; }
+  .money.coin { width: 58px; height: 58px; }
+  .money.coin.big { width: 64px; height: 64px; }
+  .money.note { width: 100px; height: 54px; }
+  /* Letters and Numbers: the page scrolls if the card is taller than the screen */
+  .letters, .numbers { overflow-y: auto; gap: 8px; }
+  .lt-look { min-height: 260px; }
+  .lt-card { padding: 10px; gap: 6px; }
+  .lt-word .art { width: 56px; }
+  .nb-big { font-size: clamp(2.6rem, 16vh, 5rem); }
+  .nb-frames { width: min(100%, 300px); gap: 4px; }
+  .lt-grid { --k: clamp(44px, 12vh, 64px); }
+  /* Felt Paint: tools in one scrollable row, so the canvas gets the height */
+  .pt-bar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; justify-content: flex-start; gap: 6px 10px; padding-bottom: 2px; }
+  .pt-bar::-webkit-scrollbar { display: none; }
+  .pt-group { flex-wrap: nowrap; flex: none; }
+  .pt-tool .bi { display: none; }
+  .paint { gap: 6px; }
+  /* Counting, Shapes, Memory: smaller pieces */
+  .habre-count { width: clamp(70px, 22vh, 110px); }
+  .doko-pile { width: clamp(80px, 24vh, 130px); }
+  .want-num { font-size: clamp(2rem, 12vh, 3.4rem); }
+  .bin-basket { height: clamp(56px, 16vh, 90px); }
+  .sh-piece { width: clamp(80px, 26vh, 140px); }
+  .sticker-toast { bottom: 8px; right: 8px; padding: 6px 12px 6px 6px; }
+  .sticker-toast-art { width: 52px; }
+}
+
+/* ---------- big screens (large monitors, TVs): use the space instead of floating small ---------- */
+@media (min-width: 1600px) and (min-height: 900px) {
+  html { font-size: 112.5%; }
+  .gate svg { width: 36px; height: 36px; }
+  .habre-small { width: clamp(92px, 9vmin, 120px); }
+  .bubble { font-size: 1.6rem; }
+  .cm-grid { width: min(100cqw, calc(100cqh * var(--cols) / var(--rows)), calc(var(--cols) * 34vmin)); }
+  .mq-card { width: min(100%, 940px); }
+  .mq-eq { font-size: clamp(3rem, 9vmin, 6.5rem); }
+  .mq-pad { grid-template-columns: repeat(3, clamp(92px, 11vmin, 124px)); gap: 14px; }
+  .mq-key { font-size: clamp(2.3rem, 4.5vmin, 3rem); }
+  .goods .art { width: clamp(110px, 13vmin, 150px); }
+  .money.coin { width: 92px; height: 92px; }
+  .money.coin.big { width: 104px; height: 104px; }
+  .money.note { width: 156px; height: 84px; }
+  .money-v { font-size: 2.1rem; }
+  .tray { min-height: 190px; }
+  .mgrid { width: min(100cqw, calc((100cqh - (var(--rows) - 1) * 14px) / var(--rows) * 0.8 * var(--cols) + (var(--cols) - 1) * 14px), calc(var(--cols) * 26vmin)); }
+  .sh-piece { width: clamp(160px, 26vmin, 280px); }
+  .bin-basket { max-width: 320px; height: clamp(110px, 15vmin, 170px); }
+  .cards { grid-template-columns: repeat(var(--n, 3), minmax(0, 380px)); }
+  .card { max-width: 380px; }
+  .card .art { max-width: min(300px, 34vh); }
+  .xylo-wrap { width: min(100%, 1320px); height: min(100%, 640px); }
+  .habre-count { width: clamp(150px, 16vmin, 200px); }
+  .doko-pile { width: clamp(170px, 18vmin, 230px); }
+  .thali { max-width: 640px; }
+}

@@ -25,6 +25,7 @@ interface Saved {
   mathLevel: Level;
   shopLevel: Level;
   shapesLevel: Level;
+  tapMusic: boolean;
 }
 
 const KEY = 'sanosathi.settings.v1';
@@ -45,6 +46,7 @@ const DEFAULTS: Saved = {
   mathLevel: 1,
   shopLevel: 1,
   shapesLevel: 1,
+  tapMusic: true,
 };
 
 function load(): Saved {
@@ -81,6 +83,8 @@ export const homeButton = signal(saved.homeButton);
 export const mathLevel = signal<Level>(saved.mathLevel);
 export const shopLevel = signal<Level>(saved.shopLevel);
 export const shapesLevel = signal<Level>(saved.shapesLevel);
+/** A soft instrument note when the child taps empty felt (each screen has its own instrument). */
+export const tapMusic = signal(saved.tapMusic);
 
 const reducedMQ = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
 const prefersReduced = signal(!!reducedMQ?.matches);
@@ -105,6 +109,7 @@ effect(() => {
     mathLevel: mathLevel.value,
     shopLevel: shopLevel.value,
     shapesLevel: shapesLevel.value,
+    tapMusic: tapMusic.value,
   };
   try {
     localStorage.setItem(KEY, JSON.stringify(data));
@@ -114,6 +119,7 @@ effect(() => {
 });
 
 effect(() => {
+  if (typeof document === 'undefined') return; // unit tests run without a page
   document.documentElement.classList.toggle('calm', calmActive.value);
   document.documentElement.lang = lang.value === 'ne' ? 'ne' : 'en';
 });

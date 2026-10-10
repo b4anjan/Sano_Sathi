@@ -17,8 +17,28 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     preact(),
     { name: 'brand-title', transformIndexHtml: (html: string) => html.replace(/%APP_NAME%/g, BRAND.appName) },
+    // Install-to-home-screen (website only; the one-file prototype has nowhere to keep icons).
+    ...(mode === 'artifact'
+      ? []
+      : [
+          {
+            name: 'install-tags',
+            transformIndexHtml: () => [
+              { tag: 'link', attrs: { rel: 'manifest', href: 'manifest.webmanifest' }, injectTo: 'head' as const },
+              { tag: 'link', attrs: { rel: 'icon', type: 'image/png', sizes: '48x48', href: 'favicon-48.png' }, injectTo: 'head' as const },
+              { tag: 'link', attrs: { rel: 'icon', type: 'image/png', sizes: '192x192', href: 'icon-192.png' }, injectTo: 'head' as const },
+              { tag: 'link', attrs: { rel: 'apple-touch-icon', href: 'apple-touch-icon.png' }, injectTo: 'head' as const },
+              { tag: 'meta', attrs: { name: 'mobile-web-app-capable', content: 'yes' }, injectTo: 'head' as const },
+              { tag: 'meta', attrs: { name: 'apple-mobile-web-app-capable', content: 'yes' }, injectTo: 'head' as const },
+              { tag: 'meta', attrs: { name: 'apple-mobile-web-app-title', content: BRAND.appName }, injectTo: 'head' as const },
+              { tag: 'meta', attrs: { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }, injectTo: 'head' as const },
+            ],
+          },
+        ]),
     ...(mode === 'artifact' ? [viteSingleFile()] : []),
   ],
+  // public/ holds the home-screen icons and manifest; the one-file prototype doesn't need them.
+  publicDir: mode === 'artifact' ? false : 'public',
   build: {
     outDir: mode === 'artifact' ? 'dist-artifact' : 'dist',
     target: 'es2020',

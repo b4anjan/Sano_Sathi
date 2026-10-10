@@ -7,7 +7,7 @@ import { S, type Bi } from './strings';
  */
 export type ActivityId =
   | 'match' | 'memory' | 'letters' | 'numbers' | 'count' | 'shapes'
-  | 'smash' | 'xylo' | 'bubbles' | 'paint' | 'village'
+  | 'smash' | 'xylo' | 'bubbles' | 'paint' | 'village' | 'copy'
   | 'math' | 'shop';
 
 export type Section = 'learn' | 'play' | 'big';
@@ -43,6 +43,7 @@ export const ACTIVITIES: Activity[] = [
   { id: 'xylo', title: S.xylo, sub: S.xyloSub, age: '2–8', color: 'var(--pink)', section: 'play' },
   { id: 'paint', title: S.paint, sub: S.paintSub, age: '2–8', color: 'var(--yellow)', section: 'play', still: true },
   { id: 'village', title: S.village, sub: S.villageSub, age: '1–6', color: 'var(--green)', section: 'play', still: true },
+  { id: 'copy', title: S.copy, sub: S.copySub, age: '3–8', color: 'var(--purple)', section: 'play', focus: true },
   { id: 'math', title: S.math, sub: S.mathSub, age: '6–8', color: 'var(--blue)', section: 'big', focus: true },
   { id: 'shop', title: S.shop, sub: S.shopSub, age: '5–8', color: 'var(--red)', section: 'big', focus: true },
 ];

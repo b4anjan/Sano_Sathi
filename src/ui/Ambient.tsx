@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'preact/hooks';
 import { onPointer } from '../core/pointer';
-import { PENTA, mallet } from '../core/audio';
+import { isBare } from '../core/tapMusic';
 
 export type AmbientLevel = 'lively' | 'gentle' | 'off';
 
 /**
  * The living felt board: stars, laligurans petals and felt dots drift down the board,
  * scatter away from a finger, and a finger or mouse leaves a trail of felt sparks.
- * Tapping an empty patch of felt makes a small burst (and, when lively, a soft note).
+ * Tapping an empty patch of felt makes a small burst (the note comes from core/tapMusic).
  *
  * One canvas, one animation loop, a hard cap on pieces, paused when the tab is hidden.
  * "Gentle" (used during learning games) keeps a few slow pieces and the trail, because a
@@ -32,10 +32,10 @@ function starPath(ctx: CanvasRenderingContext2D, r: number) {
   ctx.closePath();
 }
 
-export function Ambient({ level, tapSound }: { level: AmbientLevel; tapSound: boolean }) {
+export function Ambient({ level }: { level: AmbientLevel }) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const cfg = useRef({ level, tapSound });
-  cfg.current = { level, tapSound };
+  const cfg = useRef({ level });
+  cfg.current = { level };
 
   useEffect(() => {
     const canvas = ref.current;
@@ -97,12 +97,9 @@ export function Ambient({ level, tapSound }: { level: AmbientLevel; tapSound: bo
         spark(p.x, p.y, 18);
       } else {
         // Only a tap on bare felt bursts; taps on buttons and cards belong to the game.
-        const el = e.target as HTMLElement | null;
-        const bare = !el || !el.closest || !el.closest('button, a, input, .card, .bar, .thali, .panel-card, .kb, .item');
-        if (!bare) return;
+        if (!isBare(e.target)) return;
         const n = cfg.current.level === 'lively' ? 16 : 7;
         for (let i = 0; i < n; i++) spark(p.x, p.y, 60 + Math.random() * 90, true);
-        if (cfg.current.tapSound && cfg.current.level === 'lively') mallet(PENTA[5 + ((Math.random() * 5) | 0)], 0.18, 0.9);
       }
       // push drifting pieces away from the finger
       for (const d of drift) {

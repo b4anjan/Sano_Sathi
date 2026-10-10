@@ -110,9 +110,9 @@ const TILE_ART: Record<ActivityId, () => JSX.Element> = {
   ),
   bubbles: () => (
     <span class="tile-bubbles" aria-hidden="true">
-      <i style={{ '--s': '64px' }}>B</i>
-      <i style={{ '--s': '50px' }} class="ne">ख</i>
-      <i style={{ '--s': '40px' }}>4</i>
+      <i style={{ '--s': '64px', '--n': 64 }}>B</i>
+      <i style={{ '--s': '50px', '--n': 50 }} class="ne">ख</i>
+      <i style={{ '--s': '40px', '--n': 40 }}>4</i>
     </span>
   ),
   xylo: () => (
@@ -140,6 +140,13 @@ const TILE_ART: Record<ActivityId, () => JSX.Element> = {
       <ItemArt id="gai" class="small" />
       <ItemArt id="laligurans" class="small" />
     </>
+  ),
+  copy: () => (
+    <span class="tile-copy" aria-hidden="true">
+      {['var(--red)', 'var(--yellow)', 'var(--green)', 'var(--blue)'].map((c, i) => (
+        <i key={c} class={i === 1 ? 'on' : ''} style={{ '--c': c }} />
+      ))}
+    </span>
   ),
   math: () => (
     <>
@@ -180,7 +187,7 @@ function BuddyPicker() {
           onClick={() => pick(id)}
         >
           <ItemArt id={BUDDIES[id].art} />
-          <Bi t={BUDDIES[id].name} />
+          <Bi t={BUDDIES[id].name} class="bc-name" />
         </button>
       ))}
     </div>
@@ -214,8 +221,8 @@ export function Home() {
   const owned = stickers.value.length;
   return (
     <section class="screen home" aria-labelledby="homeName">
-      <div class="home-head">
-        <div id="homeName">
+      <div class="home-top">
+        <div id="homeName" class="home-name">
           <FeltName />
         </div>
         <div class="greet">
@@ -227,32 +234,45 @@ export function Home() {
             <Bi t={b.hello} />
           </button>
         </div>
-      </div>
-
-      <div class="home-bar">
-        <div class="lang-pick" role="group" aria-label="Language">
-          {(
-            [
-              ['en', 'English', 'en'],
-              ['ne', 'नेपाली', 'ne'],
-              ['both', 'दुवै · Both', ''],
-            ] as Array<[Lang, string, string]>
-          ).map(([v, label, l]) => (
-            <button key={v} type="button" aria-pressed={lang.value === v} onClick={() => pickLang(v)} lang={l || undefined}>
-              {label}
-            </button>
-          ))}
+        <div class="home-bar">
+          <div class="lang-pick" role="group" aria-label="Language">
+            {(
+              [
+                ['en', 'English', 'EN', 'en'],
+                ['ne', 'नेपाली', 'ने', 'ne'],
+                ['both', 'दुवै · Both', 'दुवै', ''],
+              ] as Array<[Lang, string, string, string]>
+            ).map(([v, label, short, l]) => (
+              <button
+                key={v}
+                type="button"
+                aria-pressed={lang.value === v}
+                aria-label={v === 'both' ? 'Both languages' : v === 'en' ? 'English' : 'Nepali'}
+                onClick={() => pickLang(v)}
+                lang={l || undefined}
+              >
+                <span class="long">{label}</span>
+                <span class="short" aria-hidden="true">
+                  {short}
+                </span>
+              </button>
+            ))}
+          </div>
+          <BuddyPicker />
         </div>
-        <BuddyPicker />
-        <button type="button" class="sticker-btn" onClick={() => open('stickers', S.stickers)}>
+        <button type="button" class="sticker-btn" onClick={() => open('stickers', S.stickers)} aria-label={`${S.stickers.en}: ${owned} of ${ITEMS.length}`}>
           <span class="sticker-btn-art" aria-hidden="true">
             <ItemArt id={stickers.value[owned - 1] ?? 'tara'} />
           </span>
-          <span>
+          <span class="sb-text">
             <Bi t={S.stickers} />
             <small>
               {owned}/{ITEMS.length} · ★ {totalStars.value % 5}/5
             </small>
+          </span>
+          <span class="sb-count" aria-hidden="true">
+            {owned}
+            <small>/{ITEMS.length}</small>
           </span>
         </button>
       </div>

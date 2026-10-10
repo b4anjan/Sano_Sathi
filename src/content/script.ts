@@ -60,6 +60,8 @@ const USE_HINT: Record<(typeof SPOKEN_S)[number], string> = {
   paint: 'Said when Felt Paint opens',
   village: 'Said when My Village opens',
   stickers: 'Said when the sticker book opens',
+  copy: 'Said when Copy Me opens',
+  stickerHow: 'Sticker book: how to earn stickers (tap the line)',
   tapBasket: 'Counting: when the plate is still empty',
   plateFull: 'Counting: when no more fit',
   countTogether: 'Counting: before counting along',
@@ -96,6 +98,10 @@ export function scriptFor(l: RecLang): Line[] {
     { key: '_allfound', group: 'sentences', text: PHRASES.allfound[l], hint: 'Find the Pair: when every pair is found' },
     { key: '_pop', group: 'sentences', text: PHRASES.pop[l], hint: l === 'ne' ? 'Bubble Pop: said after the letter, "B फोड!"' : 'Bubble Pop: said before the letter, "Pop… B!"' },
     { key: '_night', group: 'sentences', text: PHRASES.night[l], hint: 'My Village: when the sun is tapped' },
+    { key: '_watch', group: 'sentences', text: PHRASES.watch[l], hint: 'Copy Me: before the lights play' },
+    { key: '_yourTurn', group: 'sentences', text: PHRASES.yourTurn[l], hint: 'Copy Me: when the child should copy' },
+    { key: '_levelUp', group: 'sentences', text: PHRASES.levelUp[l], hint: 'Copy Me: when a level is finished' },
+    { key: '_oops', group: 'sentences', text: PHRASES.oops[l], hint: 'Copy Me: after a wrong block' },
   );
   for (const [k, g] of Object.entries(GREETINGS)) {
     out.push({ key: `_${k}`, group: 'sentences', text: g[l], hint: k === 'late' ? 'Home: after 8 in the evening' : `Home: greeting in the ${k}` });

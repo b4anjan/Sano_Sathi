@@ -4,6 +4,8 @@ import { unlockAudio, sfx, bloop } from '../../core/audio';
 import { say, stopSpeech, type Part } from '../../core/voice';
 import { stickers, totalStars, starsToNext, STARS_PER_STICKER } from '../../core/rewards';
 import { ITEMS, CATEGORIES } from '../../content/items';
+import { S } from '../../content/strings';
+import { SpeakerIcon } from '../letters/Letters';
 import { Bi, ItemArt } from '../../ui/common';
 import { Buddy } from '../../ui/Buddy';
 
@@ -51,6 +53,20 @@ export function Stickers() {
           </span>
         </div>
       </div>
+      <button
+        type="button"
+        class="sk-how"
+        onClick={() => {
+          unlockAudio();
+          const l = lang.value;
+          const ne: Part = { text: S.stickerHow.ne, lang: 'ne', clips: ['ne/s-stickerHow'] };
+          const en: Part = { text: S.stickerHow.en, lang: 'en', clips: ['en/s-stickerHow'] };
+          void say(l === 'en' ? [en] : l === 'ne' ? [ne] : [ne, en]);
+        }}
+      >
+        <SpeakerIcon />
+        <Bi t={S.stickerHow} />
+      </button>
       <div class="sk-pages">
         {CATEGORIES.map((c) => (
           <section key={c.id} class="sk-page" style={{ '--tint': c.tint }}>
