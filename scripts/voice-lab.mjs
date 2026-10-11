@@ -31,6 +31,7 @@ const LINES = [
   { id: '6-sentence', lang: 'ne', text: 'राति भयो। चाँडै सुत्ने बेला भयो!' },
   { id: '7-long', lang: 'ne', text: 'घोडा अङ्ग्रेजी L आकारमा उफ्रन्छ: दुई कोठा, अनि एक कोठा छेउतिर।' },
   { id: '8-english', lang: 'en', text: "It's getting late. Sleep time soon!" },
+  { id: '9-bignum', lang: 'ne', word: true, text: '४४' },
 ];
 
 /** How the app makes clips today, and cleaner alternatives. */
@@ -69,9 +70,15 @@ const nepali = voices
 writeFileSync(join(out, 'voices.json'), JSON.stringify({ count: voices.length, nepali }, null, 1));
 console.log(`${voices.length} voices; ${nepali.length} can speak Nepali:`, nepali.map((v) => v.name).join(', '));
 
-// Up to three multilingual voices that list Nepali as a second language join the comparison.
-for (const v of nepali.filter((x) => !x.locale.startsWith('ne')).slice(0, 3)) {
-  VARIANTS.push({ id: `M-${v.name.replace(/^[a-z]{2}-[A-Z]{2}-/, '').replace(/Neural$/, '')}`, desc: `${v.name}: a multilingual voice speaking Nepali; best quality; one MP3; steady volume`, ne: v.name, en: v.name, pitch: 0, slow: 0, hq: true, multi: true });
+// Multilingual voices to try: LAB_VOICES (comma list) or, by default, the first three.
+const wanted = (process.env.LAB_VOICES || '').split(',').map((s) => s.trim()).filter(Boolean);
+const pickList = wanted.length ? nepali.filter((x) => wanted.includes(x.name)) : nepali.filter((x) => !x.locale.startsWith('ne')).slice(0, 3);
+if (wanted.length) {
+  // A focused round: keep only today's voice and the clean native voices for reference.
+  VARIANTS.splice(0, VARIANTS.length, ...VARIANTS.filter((v) => ['A-now-cat', 'B-hemkala-clean', 'D-sagar-clean'].includes(v.id)));
+}
+for (const v of pickList) {
+  VARIANTS.push({ id: `M-${v.name.replace(/:.*$/, '').replace(/Neural$/, '')}${v.type === 'NeuralHD' ? '-HD' : ''}`, desc: `${v.name}: a multilingual voice (${v.gender.toLowerCase()}) speaking Nepali and English; best quality; one MP3; steady volume`, ne: v.name, en: v.name, pitch: 0, slow: 0, hq: true, multi: true });
 }
 
 const pct = (n) => `${n >= 0 ? '+' : ''}${n}%`;
