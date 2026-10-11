@@ -24,6 +24,7 @@ export const SCREEN_INSTRUMENT: Record<Screen, Instrument | null> = {
   paint: 'panflute',
   village: 'guitar',
   copy: 'celesta',
+  chess: 'santoor',
   math: 'sitar',
   shop: 'harmonium',
   stickers: 'xylophone',

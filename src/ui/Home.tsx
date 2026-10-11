@@ -13,26 +13,38 @@ import { BRAND } from '../brand';
 import { Bi, ItemArt } from './common';
 import { Buddy, buddyParts } from './Buddy';
 import { dhakaTile } from '../content/art';
+import { pieceSVG } from '../modes/chess/pieces';
 
 const FELT_COLORS = ['var(--red)', 'var(--yellow)', 'var(--green)', 'var(--sky)', 'var(--orange)', 'var(--pink)', 'var(--purple)', 'var(--blue)'];
 
-/** The app name in felt letters. Built from BRAND, so a rename needs no change here. */
+/**
+ * The app name in felt letters: "Little Friend" for English, सानो साथी for Nepali (and for
+ * both languages), with the other name underneath. Built from BRAND, so a rename needs no
+ * change here. Devanagari is coloured word by word: splitting it into letters would break
+ * the joined letters and vowel signs apart.
+ */
 function FeltName() {
+  const nepaliFirst = lang.value !== 'en';
   let n = 0;
+  const big = nepaliFirst ? BRAND.appNameNe : BRAND.appName;
+  const small = nepaliFirst ? BRAND.appName : BRAND.appNameNe;
+  const pieces = nepaliFirst ? big.split(/(\s+)/) : big.split('');
   return (
-    <h1 class="felt-name" aria-label={`${BRAND.appName}, ${BRAND.appNameNe}`}>
+    <h1 class={`felt-name${nepaliFirst ? ' ne-first' : ''}`} aria-label={`${BRAND.appName}, ${BRAND.appNameNe}`}>
       <span aria-hidden="true">
-        {BRAND.appName.split('').map((ch, i) => {
-          if (ch === ' ') return <span key={i}> </span>;
+        {pieces.map((ch, i) => {
+          if (!ch.trim()) return <span key={i}> </span>;
           const c = FELT_COLORS[n++ % FELT_COLORS.length];
           const r = ((i * 37) % 9) - 4;
           return (
-            <span key={i} class="fl" style={{ '--c': c, '--r': `${r}deg` }}>
+            <span key={i} class="fl" lang={nepaliFirst ? 'ne' : undefined} style={{ '--c': c, '--r': `${nepaliFirst ? r / 2 : r}deg` }}>
               {ch}
             </span>
           );
         })}
-        <span class="rest" lang="ne">{BRAND.appNameNe}</span>
+        <span class="rest" lang={nepaliFirst ? 'en' : 'ne'}>
+          {small}
+        </span>
       </span>
     </h1>
   );
@@ -154,6 +166,13 @@ const TILE_ART: Record<ActivityId, () => JSX.Element> = {
       {big('+', 'var(--chalk)')}
       {big('5', 'var(--green)')}
     </>
+  ),
+  chess: () => (
+    <span class="tile-chess" aria-hidden="true">
+      <span class="tile-chess-board" />
+      <span dangerouslySetInnerHTML={{ __html: pieceSVG('n', 'w') }} />
+      <span dangerouslySetInnerHTML={{ __html: pieceSVG('k', 'b') }} />
+    </span>
   ),
   shop: () => (
     <>

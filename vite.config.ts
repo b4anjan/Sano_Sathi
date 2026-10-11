@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => ({
   resolve: mode === 'artifact' ? { alias: [{ find: /^\.\/aiClips$/, replacement: './aiClips.empty' }] } : undefined,
   plugins: [
     preact(),
-    { name: 'brand-title', transformIndexHtml: (html: string) => html.replace(/%APP_NAME%/g, BRAND.appName) },
+    { name: 'brand-title', transformIndexHtml: (html: string) => html.replace(/%APP_NAME%/g, `${BRAND.appName} · ${BRAND.appNameNe}`) },
     // Install-to-home-screen (website only; the one-file prototype has nowhere to keep icons).
     ...(mode === 'artifact'
       ? []

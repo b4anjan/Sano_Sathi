@@ -11,14 +11,14 @@ import { audioOut } from './audio';
  *   blown    flute, pan flute, harmonium: soft oscillators with breath and vibrato
  */
 export type Instrument =
-  | 'bells' | 'marimba' | 'kalimba' | 'musicbox' | 'vibraphone' | 'celesta' | 'xylophone' | 'steeldrum' | 'piano'
+  | 'bells' | 'marimba' | 'kalimba' | 'musicbox' | 'vibraphone' | 'celesta' | 'xylophone' | 'steeldrum' | 'piano' | 'santoor'
   | 'harp' | 'guitar' | 'ukulele' | 'sitar'
   | 'flute' | 'panflute' | 'harmonium';
 
 /** Display names for the grown-ups panel. */
 export const INSTRUMENT_NAMES: Record<Instrument, string> = {
   bells: 'bells', marimba: 'marimba', kalimba: 'kalimba', musicbox: 'music box', vibraphone: 'vibraphone',
-  celesta: 'celesta', xylophone: 'xylophone', steeldrum: 'steel drum', piano: 'piano', harp: 'harp',
+  celesta: 'celesta', xylophone: 'xylophone', steeldrum: 'steel drum', piano: 'piano', santoor: 'santoor', harp: 'harp',
   guitar: 'guitar', ukulele: 'ukulele', sitar: 'sitar', flute: 'flute', panflute: 'pan flute', harmonium: 'harmonium',
 };
 
@@ -67,6 +67,8 @@ const R: Record<Instrument, Recipe> = {
   celesta: { kind: 'struck', oct: 2, partials: [[1, 1, 1.0], [3, 0.16, 0.3], [4, 0.12, 0.18]] },
   xylophone: { kind: 'struck', oct: 2, partials: [[1, 1, 0.55], [3, 0.45, 0.15], [6.2, 0.15, 0.05]] },
   steeldrum: { kind: 'struck', oct: 1, partials: [[1, 1, 1.0], [2, 0.65, 0.6], [3, 0.3, 0.35], [4.02, 0.14, 0.2]], bend: 1.03 },
+  // Hammered dulcimer: bright, several strings per note (the slight detune shimmers).
+  santoor: { kind: 'struck', oct: 1, partials: [[1, 1, 1.6], [2, 0.55, 0.9], [3, 0.3, 0.45], [5.1, 0.1, 0.12]], detune: 9 },
   piano: { kind: 'struck', oct: 1, partials: [[1, 1, 1.5], [2, 0.45, 0.9], [3, 0.22, 0.55], [4, 0.12, 0.35], [5, 0.06, 0.25]], detune: 6 },
   harp: { kind: 'plucked', oct: 1, keep: 0.997, bright: 0.65, dur: 1.8 },
   guitar: { kind: 'plucked', oct: 0.5, keep: 0.996, bright: 0.45, dur: 1.8 },

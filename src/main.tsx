@@ -7,7 +7,7 @@ import { startTapMusic } from './core/tapMusic';
 import { App } from './App';
 import './styles.css';
 
-document.title = BRAND.appName;
+document.title = `${BRAND.appName} · ${BRAND.appNameNe}`;
 initFelt();
 startPointerTracking();
 startTapMusic(); // a soft note on empty felt, a different instrument on every screen

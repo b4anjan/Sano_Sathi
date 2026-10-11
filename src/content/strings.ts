@@ -57,12 +57,14 @@ export const S = {
   stickerHow: { en: 'Play any game to earn stars. Every 5 stars unlock a new sticker!', ne: 'जुनसुकै खेल खेलेर तारा कमाऊ। हरेक ५ तारामा नयाँ स्टिकर!' },
   copy: { en: 'Copy Me', ne: 'मेरो नक्कल गर' },
   copySub: { en: 'Watch the lights, then copy the pattern.', ne: 'बत्ती हेर, अनि त्यस्तै थिच।' },
+  chess: { en: 'Chess', ne: 'चेस' },
+  chessSub: { en: 'Play your buddy, or learn how each piece moves.', ne: 'साथीसँग खेल, वा हरेक गोटीको चाल सिक।' },
 } satisfies Record<string, Bi>;
 
 /** Spoken sentences that have their own recording, keyed by clip key (`s-<name>` for S above). */
 export const SPOKEN_S = [
   'match', 'memory', 'count', 'smash', 'xylo', 'letters', 'numbers', 'math', 'shop', 'shapes', 'bubbles', 'paint', 'village', 'stickers',
-  'copy', 'tapBasket', 'plateFull', 'countTogether', 'tryAgain', 'stickerHow',
+  'copy', 'chess', 'tapBasket', 'plateFull', 'countTogether', 'tryAgain', 'stickerHow',
 ] as const;
 
 /** Short phrases the games join to a word. Clip key: `_<name>` (for example ne/_where). */

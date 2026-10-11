@@ -4,6 +4,7 @@ import { EN_LETTERS, NE_VOWELS, NE_CONSONANTS } from './letters';
 import { S, SPOKEN_S, PHRASES, wantText } from './strings';
 import { COLORS, SHAPES } from './shapes';
 import { BUDDIES, BUDDY_IDS, GREETINGS } from './buddies';
+import { CH, CH_HINT, PIECE_NAMES, type ChLine } from './chess';
 
 /** Scene words in My Village that are not picture items (clip key w-<id>). Kept here so the
  *  studio and the village agree; the village imports this list. */
@@ -61,6 +62,7 @@ const USE_HINT: Record<(typeof SPOKEN_S)[number], string> = {
   village: 'Said when My Village opens',
   stickers: 'Said when the sticker book opens',
   copy: 'Said when Copy Me opens',
+  chess: 'Said when Chess opens',
   stickerHow: 'Sticker book: how to earn stickers (tap the line)',
   tapBasket: 'Counting: when the plate is still empty',
   plateFull: 'Counting: when no more fit',
@@ -107,6 +109,7 @@ export function scriptFor(l: RecLang): Line[] {
     out.push({ key: `_${k}`, group: 'sentences', text: g[l], hint: k === 'late' ? 'Home: after 8 in the evening' : `Home: greeting in the ${k}` });
   }
   for (const k of SPOKEN_S) out.push({ key: `s-${k}`, group: 'sentences', text: S[k][l], hint: USE_HINT[k] });
+  for (const k of Object.keys(CH) as ChLine[]) out.push({ key: `ch-${k}`, group: 'sentences', text: CH[k][l], hint: CH_HINT[k] });
   for (let n = 1; n <= 10; n++) {
     out.push({ key: `want-${n}`, group: 'sentences', text: wantText(n)[l], hint: n <= 3 ? 'Counting: level 1 and up' : n <= 5 ? 'Counting: level 2 and up' : 'Counting: level 3' });
   }
@@ -116,6 +119,9 @@ export function scriptFor(l: RecLang): Line[] {
   }
   for (const sh of SHAPES) {
     out.push({ key: `shape-${sh.id}`, group: 'colors', text: sh[l], hint: `Shape · ${l === 'ne' ? sh.en : sh.ne}` });
+  }
+  for (const [id, nm] of Object.entries(PIECE_NAMES)) {
+    out.push({ key: `pc-${id}`, group: 'words', text: nm[l], hint: `Chess piece · ${l === 'ne' ? nm.en : nm.ne}` });
   }
 
   for (const id of BUDDY_IDS) {

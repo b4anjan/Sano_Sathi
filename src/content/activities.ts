@@ -8,7 +8,7 @@ import { S, type Bi } from './strings';
 export type ActivityId =
   | 'match' | 'memory' | 'letters' | 'numbers' | 'count' | 'shapes'
   | 'smash' | 'xylo' | 'bubbles' | 'paint' | 'village' | 'copy'
-  | 'math' | 'shop';
+  | 'math' | 'shop' | 'chess';
 
 export type Section = 'learn' | 'play' | 'big';
 
@@ -46,6 +46,7 @@ export const ACTIVITIES: Activity[] = [
   { id: 'copy', title: S.copy, sub: S.copySub, age: '3–8', color: 'var(--purple)', section: 'play', focus: true },
   { id: 'math', title: S.math, sub: S.mathSub, age: '6–8', color: 'var(--blue)', section: 'big', focus: true },
   { id: 'shop', title: S.shop, sub: S.shopSub, age: '5–8', color: 'var(--red)', section: 'big', focus: true },
+  { id: 'chess', title: S.chess, sub: S.chessSub, age: '4–8', color: 'var(--green)', section: 'big', focus: true },
 ];
 
 export const activityById = (id: string): Activity | undefined => ACTIVITIES.find((a) => a.id === id);

@@ -24,6 +24,7 @@ import { Paint } from './modes/paint/Paint';
 import { Village } from './modes/village/Village';
 import { Stickers } from './modes/stickers/Stickers';
 import { CopyMe } from './modes/copy/CopyMe';
+import { ChessScreen } from './modes/chess/Chess';
 
 export function App() {
   // Typing the word "parent" anywhere opens the grown-ups panel.
@@ -71,6 +72,7 @@ export function App() {
             {s === 'copy' && <CopyMe />}
             {s === 'math' && <MathQuest />}
             {s === 'shop' && <Shop />}
+            {s === 'chess' && <ChessScreen />}
             {s === 'stickers' && <Stickers />}
             {s === 'studio' && <Studio />}
           </main>

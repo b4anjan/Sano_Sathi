@@ -1,11 +1,12 @@
-# Sano Sathi (working name)
+# Little Friend · सानो साथी (Sano Sathi)
 
-A bilingual English–Nepali learning playground for ages 2–8. One TypeScript codebase:
+A bilingual English–Nepali learning playground for ages 2–8. English speakers see the name
+"Little Friend"; the Nepali name is सानो साथी (Sano Sathi, the repository name). One TypeScript codebase:
 the website now, and the iPhone, iPad and Android apps later (wrapped with Capacitor).
 
 ## What's inside
 
-**14 activities**, grouped on the home screen:
+**15 activities**, grouped on the home screen:
 
 | Section | Activity | Ages | What it does |
 | --- | --- | --- | --- |
@@ -23,6 +24,7 @@ the website now, and the iPhone, iPad and Android apps later (wrapped with Capac
 | | Copy Me | 3–8 | Watch the blocks light up and sing, then copy the pattern; 15 levels (4, 6, then 8 blocks; shapes change from level 6) |
 | Big kids 6–8 | Math Quest | 6–8 | + − × missing-number and compare, 3 levels, keypad, "show me" pictures |
 | | Rupee Shop | 5–8 | Pay with felt coins and notes; level 3 adds "how much change?" |
+| | Chess | 4–8 | Play the buddy (5 levels) or a friend on one device; "Meet the pieces" lessons; How to play card |
 
 **Buddies.** The child picks Cat (cheerful female voice), Puppy (little kid voice) or Panda
 (soft, welcoming male voice) on the home screen. The buddy guides every game; tapping it
@@ -35,7 +37,7 @@ Nothing is ever taken away. A line at the top of the Sticker book explains this 
 
 **Tap music.** Tapping empty felt plays one soft note; every screen has its own instrument
 (bells on home, marimba, kalimba, harp, music box, steel drum, ukulele, piano, vibraphone,
-flute, pan flute, guitar, celesta, sitar, harmonium, xylophone), higher notes nearer the top
+flute, pan flute, guitar, celesta, santoor, sitar, harmonium, xylophone), higher notes nearer the top
 of the screen. Learning games play it more softly; game pieces keep their own sounds. All
 synthesized in `src/core/instruments.ts` (no sound files). Grown-ups can switch it off.
 
@@ -43,6 +45,19 @@ synthesized in `src/core/instruments.ts` (no sound files). Grown-ups can switch 
 faces, sticker counter); phones on their side get thinner chrome and side-by-side layouts;
 tile pictures scale with their tile; big monitors and TVs get larger pieces. Tap targets are
 at least 44 px, and text follows the device's text-size setting.
+
+**Chess.** Tapping a piece lights up every square it can reach (green dots; red rings for
+captures) and the buddy says the piece's name in both languages, plus how it moves the first
+time each kind of piece is tapped in a game. A "How to play" card has six simple rules, each
+read aloud. Against the buddy: levels 1–5 (Baby steps to Champion), "Help me" (shows a good
+move), "Take back", "Warn me" (points out a move that leaves a piece where it can simply be
+taken; tap again to play it anyway), play as white or black, turn the board. Two players:
+the same, plus "Face each other" for a tablet lying flat. "Meet the pieces": 6 lessons × 3
+stages, move one piece onto every star in as few moves as you can. Games are saved on the
+device. Rules (legal moves, draws, saving) use chess.js; the buddy thinks on a small fast
+board in `src/modes/chess/engine.ts`, checked against published perft counts, in a Web Worker
+so the screen never freezes. Piece names (राजा, रानी, हात्ती, ऊँट, घोडा, सिपाही) live in
+`src/content/chess.ts`; change them there and the voices follow.
 
 **Install to the home screen.** The site has a web manifest and icons (`public/`), so
 "Add to Home screen" (Android, iPhone, iPad) or "Install" (desktop Chrome/Edge) opens it full

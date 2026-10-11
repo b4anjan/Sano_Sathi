@@ -72,12 +72,12 @@ export const BUDDIES: Record<BuddyId, Buddy> = {
   },
   puppy: {
     id: 'puppy',
-    name: { en: 'Puppy', ne: 'कुकुरे' },
+    name: { en: 'Puppy', ne: 'कुकुर' },
     art: 'kukur',
     voice: { gender: 'female', pitch: 1.6, rate: 1.08, kid: true },
     tint: '#E8C9A6',
     voiceLabel: 'Little kid voice',
-    hello: { en: "Woof! I'm Puppy. Let's play!", ne: 'भुक् भुक्! म कुकुरे। आऊ, खेलौँ!' },
+    hello: { en: "Woof! I'm Puppy. Let's play!", ne: 'भुक् भुक्! म कुकुर। आऊ, खेलौँ!' },
     reactions: [
       { id: 'bark', anim: 'hop', sound: 'bark', fx: 'woof!', say: { en: 'Woof woof! Hello, friend!', ne: 'भुक् भुक्! नमस्ते साथी!' } },
       { id: 'wag', anim: 'wag', sound: 'wag', fx: 'wiggle!', say: { en: 'My tail goes wiggle wiggle!', ne: 'मेरो पुच्छर हल्लियो, हल्लियो!' } },

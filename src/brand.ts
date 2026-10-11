@@ -5,8 +5,11 @@
  * later, the Capacitor app id all come from this object.
  */
 export const BRAND = {
-  appName: 'Sano Sathi',
+  /** English name (what English speakers see); the Nepali name below is the original. */
+  appName: 'Little Friend',
   appNameNe: 'सानो साथी',
+  /** The Nepali name in Latin letters (repository and web address). */
+  appNameRoman: 'Sano Sathi',
   publisher: 'Mohan Karki', /**'CastronTech', */
   /** The buddy a new player starts with: 'cat', 'puppy' or 'panda' (content/buddies.ts). */
   defaultBuddy: 'cat',
@@ -14,6 +17,6 @@ export const BRAND = {
   appId: 'com.castrontech.sanosathi',
   /** The public web address (used in help text, e.g. "open the app on its own to record"). */
   siteUrl: 'https://b4anjan.github.io/Sano_Sathi/',
-  version: '0.6.0',
-  stage: 'Prototype v6',
+  version: '0.7.0',
+  stage: 'Prototype v7',
 } as const;

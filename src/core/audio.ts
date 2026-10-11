@@ -229,7 +229,8 @@ function hiss(o: NoiseOpt): void {
 
 export type Sfx =
   | 'meow' | 'purr' | 'whee' | 'sneeze' | 'bark' | 'wag' | 'roll' | 'hiccup' | 'chime' | 'munch' | 'yawn'
-  | 'tumble' | 'giggle' | 'moo' | 'baa' | 'cluck' | 'splash' | 'pop' | 'swish' | 'coin' | 'sparkle' | 'thump';
+  | 'tumble' | 'giggle' | 'moo' | 'baa' | 'cluck' | 'splash' | 'pop' | 'swish' | 'coin' | 'sparkle' | 'thump'
+  | 'tock' | 'clack';
 
 const SFX: Record<Sfx, () => void> = {
   meow: () => tone({ type: 'sawtooth', path: [[0, 520], [0.16, 840], [0.55, 560]], dur: 0.6, gain: 0.16, filter: ['bandpass', 1300, 1.8], vibrato: [6, 12] }),
@@ -274,6 +275,16 @@ const SFX: Record<Sfx, () => void> = {
   },
   sparkle: () => [2, 4, 6, 8].forEach((k, i) => mallet(PENTA[k] * 2, 0.12, 0.5, i * 0.06)),
   thump: () => tone({ path: [[0, 160], [0.12, 55]], dur: 0.16, gain: 0.4 }),
+  // A wooden chess piece set down, and one knocking another off the board.
+  tock: () => {
+    tone({ type: 'triangle', path: [[0, 240], [0.05, 160]], dur: 0.09, gain: 0.32, attack: 0.003 });
+    hiss({ dur: 0.03, gain: 0.12, filter: ['bandpass', 1900, 2.5] });
+  },
+  clack: () => {
+    tone({ type: 'triangle', path: [[0, 330], [0.05, 190]], dur: 0.08, gain: 0.3, attack: 0.003 });
+    hiss({ dur: 0.04, gain: 0.2, filter: ['bandpass', 2600, 1.6] });
+    tone({ type: 'triangle', path: [[0, 260], [0.05, 170]], at: 0.07, dur: 0.08, gain: 0.22, attack: 0.003 });
+  },
 };
 
 export function sfx(name: Sfx): void {
