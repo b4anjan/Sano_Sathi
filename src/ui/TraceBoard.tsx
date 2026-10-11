@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'preact/hooks';
-import { GRID, alphaMask, passed, scoreTrace } from '../core/trace';
+import { GRID, alphaMask, glyphModel, passed, progress, scoreStrokes, type GlyphModel, type Pt as GridPt } from '../core/trace';
 import { unlockAudio, mallet, PENTA } from '../core/audio';
 
 /**
  * A chalk-on-felt tracing board for one letter or number.
  * The glyph is drawn as a dotted guide; the child traces it with a finger or mouse in felt
- * colours. After every stroke the trace is scored (core/trace.ts); onPass fires once.
+ * colours. After every stroke the trace is scored (core/trace.ts); onPass fires once, only when
+ * every stroke of the letter has been traced. Until then, small dots show the parts still to do.
  */
 
 const INKS = ['#F6C232', '#5BB8EC', '#EC6DA6', '#5DB646', '#F28C28', '#8D5CD0', '#E5483D'];
@@ -53,7 +54,9 @@ export function TraceBoard({
   const guideRef = useRef<HTMLCanvasElement>(null);
   const inkRef = useRef<HTMLCanvasElement>(null);
   const strokes = useRef<Array<{ c: string; pts: Pt[] }>>([]);
-  const mask = useRef<Uint8Array | null>(null);
+  const model = useRef<GlyphModel | null>(null);
+  /** Skeleton cells still to trace (grid units); shown as dots once tracing has started. */
+  const todo = useRef<GridPt[]>([]);
   const geo = useRef({ side: 0, ox: 0, oy: 0, dpr: 1 });
   const drawing = useRef<{ c: string; pts: Pt[] } | null>(null);
   const finger = useRef<number | null>(null);
@@ -96,6 +99,20 @@ export function TraceBoard({
     ctx.strokeStyle = 'rgba(255,255,255,0.7)';
     ctx.strokeText(glyph, x, y);
     ctx.setLineDash([]);
+    // Parts still to trace: a beaded line down the middle of each stroke not done yet.
+    if (strokes.current.length && todo.current.length) {
+      // White, like the guide (no ink colour is white), so a hint is never mistaken for ink.
+      ctx.fillStyle = 'rgba(255,255,255,0.95)';
+      const r = Math.max(2, side * 0.01);
+      ctx.beginPath();
+      for (const [gx, gy] of todo.current) {
+        const px = ox + (gx / GRID) * side;
+        const py = oy + (gy / GRID) * side;
+        ctx.moveTo(px + r, py);
+        ctx.arc(px, py, r, 0, Math.PI * 2);
+      }
+      ctx.fill();
+    }
   };
 
   const drawInk = () => {
@@ -118,7 +135,7 @@ export function TraceBoard({
     }
   };
 
-  const buildMask = () => {
+  const buildModel = () => {
     const c = document.createElement('canvas');
     c.width = c.height = GRID;
     const ctx = c.getContext('2d', { willReadFrequently: true });
@@ -126,32 +143,22 @@ export function TraceBoard({
     const { x, y } = placeGlyph(ctx, glyph, GRID, 0, 0);
     ctx.fillStyle = '#000';
     ctx.fillText(glyph, x, y);
-    mask.current = alphaMask(ctx.getImageData(0, 0, GRID, GRID).data);
+    model.current = glyphModel(alphaMask(ctx.getImageData(0, 0, GRID, GRID).data), GRID);
   };
 
   const score = () => {
-    if (!mask.current) buildMask();
-    if (!mask.current) return;
-    const c = document.createElement('canvas');
-    c.width = c.height = GRID;
-    const ctx = c.getContext('2d', { willReadFrequently: true });
-    if (!ctx) return;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.lineWidth = GRID * 0.13;
-    ctx.strokeStyle = '#000';
-    for (const s of strokes.current) {
-      ctx.beginPath();
-      s.pts.forEach(([px, py], i) => (i ? ctx.lineTo(px * GRID, py * GRID) : ctx.moveTo(px * GRID, py * GRID)));
-      if (s.pts.length === 1) ctx.lineTo(s.pts[0][0] * GRID + 0.1, s.pts[0][1] * GRID);
-      ctx.stroke();
-    }
-    const sc = scoreTrace(mask.current, alphaMask(ctx.getImageData(0, 0, GRID, GRID).data));
-    onProgress?.(sc.coverage);
+    if (!model.current) buildModel();
+    if (!model.current) return;
+    const paths = strokes.current.map((s) => s.pts.map(([px, py]) => [px * GRID, py * GRID] as GridPt));
+    const sc = scoreStrokes(model.current, paths);
+    onProgress?.(progress(sc));
+    todo.current = sc.todo;
     if (!passedRef.current && passed(sc)) {
       passedRef.current = true;
+      todo.current = [];
       onPass();
     }
+    drawGuide();
   };
 
   const layout = () => {
@@ -173,18 +180,19 @@ export function TraceBoard({
     drawInk();
   };
 
-  // New glyph or wipe: reset strokes, rebuild the mask once fonts are ready.
+  // New glyph or wipe: reset strokes, rebuild the letter model once fonts are ready.
   useEffect(() => {
     strokes.current = [];
+    todo.current = [];
     passedRef.current = false;
-    mask.current = null;
+    model.current = null;
     onProgress?.(0);
     layout();
     const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
     let alive = true;
     const redo = () => {
       if (!alive) return;
-      mask.current = null;
+      model.current = null;
       layout();
     };
     fonts?.load?.(glyphFont(glyph, 100), glyph).then(redo, redo);

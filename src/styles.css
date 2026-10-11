@@ -870,7 +870,7 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
 @media (max-width: 560px) {
   .mathq { padding: 4px 12px 10px; }
   .mq-op-btn { padding-right: 4px; }
-  .mq-op-btn .bi { display: none; }
+  .mq-op-btn .txt { display: none; }
   .mq-card { padding: 14px 14px 16px; }
 }
 
@@ -1048,7 +1048,7 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
 .pt-canvas canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
 .pt-canvas.mirror::after { content: ''; position: absolute; top: 8px; bottom: 8px; left: 50%; border-left: 2px dashed rgba(29, 42, 40, 0.18); pointer-events: none; }
 @media (max-width: 760px) {
-  .pt-tool .bi { display: none; }
+  .pt-tool .txt { display: none; }
   .pt-tool { padding: 4px 10px; min-width: 44px; justify-content: center; }
   .pt-color { width: 40px; height: 40px; }
 }
@@ -1334,7 +1334,7 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
   .mq-top { flex-wrap: nowrap; gap: 8px; }
   .mq-ops { flex-wrap: nowrap; gap: 6px; }
   .mq-op-btn { padding-right: 4px; min-height: 46px; }
-  .mq-op-btn .bi { display: none; }
+  .mq-op-btn .txt { display: none; }
   .mq-op-btn b { width: 38px; height: 38px; }
   .mq-main { grid-template-columns: auto minmax(0, 1fr); gap: 12px; }
   .mq-side { grid-auto-flow: row; padding-top: 0; }
@@ -1370,7 +1370,7 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
   .pt-bar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; justify-content: flex-start; gap: 6px 10px; padding-bottom: 2px; }
   .pt-bar::-webkit-scrollbar { display: none; }
   .pt-group { flex-wrap: nowrap; flex: none; }
-  .pt-tool .bi { display: none; }
+  .pt-tool .txt { display: none; }
   .paint { gap: 6px; }
   /* Counting, Shapes, Memory: smaller pieces */
   .habre-count { width: clamp(70px, 22vh, 110px); }
@@ -1418,6 +1418,7 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
 .ch-status small { font-size: 0.66em; color: var(--ink-soft); font-weight: 700; }
 .ch-modes { margin-left: auto; }
 .ch-modes button { padding: 4px 14px; }
+.ch-modes button .txt { min-width: 0; overflow-wrap: anywhere; text-wrap: balance; }
 .ch-howto { background: var(--yellow) !important; color: var(--ink) !important; box-shadow: 0 3px 0 var(--shadow) !important; }
 .ch-howto > span[aria-hidden] { font-weight: 800; font-size: 1.2rem; }
 .ch-main { position: relative; min-height: 0; container: chm / size; }
@@ -1562,16 +1563,19 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
 .tile-chess svg { width: 100%; height: auto; display: block; }
 .calm .cdot, .calm .csq.hint::after, .calm .cart.star, .calm .ch-card { animation: none; }
 .calm .cart.piece.arrive { animation-duration: 0.01s; }
+/* Narrower: the modes get a row of their own, in equal boxes whose labels wrap inside them. */
 @media (max-width: 760px) {
-  .ch-modes { margin-left: 0; }
+  .ch-modes { margin-left: 0; width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; gap: 6px; }
+  .ch-modes button { min-width: 0; border-radius: 16px; padding: 4px 10px; line-height: 1.1; text-align: center; }
 }
 @media (max-width: 599px) {
   .chess { padding: 2px 10px 8px; gap: 6px; }
-  .ch-modes { width: 100%; flex-wrap: nowrap; gap: 6px; }
-  .ch-modes button { flex: 1 1 0; min-width: 0; padding: 4px 6px; font-size: 0.9rem; justify-content: center; }
+  /* Phones: icon above a short label, like a tab bar; "How to play" becomes a "?" button. */
+  .ch-modes button { flex-direction: column; gap: 2px; padding: 5px 4px; min-height: 56px; font-size: 0.88rem; }
+  .ch-modes button > span[aria-hidden] { font-size: 1.15rem; line-height: 1; }
   .ch-modes button .bi .en-sub, .ch-btn .bi .en-sub { display: none; }
-  .ch-howto { flex: 0 0 44px !important; }
-  .ch-howto .bi { display: none !important; }
+  .ch-howto { width: 48px; }
+  .ch-howto .txt { display: none !important; }
   .ch-actions { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
   .ch-btn { flex-direction: column; gap: 2px; padding: 4px 2px; font-size: 0.72rem; text-align: center; min-height: 52px; }
   .ch-btn .bi { align-items: center; }
@@ -1610,7 +1614,9 @@ legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
   .ch-top { flex-wrap: nowrap; }
   .ch-status { flex: 1 1 auto; font-size: 0.88rem; line-height: 1.15; }
   .ch-status small { display: none; }
-  .ch-modes { flex: none; flex-wrap: nowrap; gap: 6px; }
-  .ch-modes button { padding: 4px 10px; }
-  .ch-howto .bi { display: none !important; }
+  .ch-modes { flex: none; width: auto; display: flex; flex-wrap: nowrap; gap: 6px; }
+  .ch-modes button { flex-direction: row; min-width: 44px; min-height: 44px; padding: 4px 10px; border-radius: 999px; }
+  .ch-modes button .txt { white-space: nowrap; }
+  .ch-howto { width: auto; }
+  .ch-howto .txt { display: none !important; }
 }

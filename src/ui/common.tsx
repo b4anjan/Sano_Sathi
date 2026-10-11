@@ -7,10 +7,12 @@ import { feltPatternUrl } from '../core/felt';
 /** Bilingual text: one language, or Nepali with English under it in "Both" mode. */
 export function Bi({ t, class: cls = '' }: { t: BiText; class?: string }) {
   const l = lang.value;
-  if (l === 'en') return <span class={cls} lang="en">{t.en}</span>;
-  if (l === 'ne') return <span class={`${cls} ne`} lang="ne">{t.ne}</span>;
+  // "txt" is on the label in every language mode, so CSS can hide or shape a label without
+  // caring which mode is on ("bi" is only there when both languages show).
+  if (l === 'en') return <span class={`${cls} txt`} lang="en">{t.en}</span>;
+  if (l === 'ne') return <span class={`${cls} txt ne`} lang="ne">{t.ne}</span>;
   return (
-    <span class={`${cls} bi`}>
+    <span class={`${cls} txt bi`}>
       <span class="ne" lang="ne">{t.ne}</span>
       <span class="en-sub" lang="en">{t.en}</span>
     </span>
