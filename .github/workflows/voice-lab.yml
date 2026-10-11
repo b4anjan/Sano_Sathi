@@ -10,6 +10,10 @@ on:
         description: Multilingual voices to try (comma separated full names), or empty for a default set
         type: string
         default: ''
+      round:
+        description: Which test (empty = voices; "letters" = single Nepali letters and chants)
+        type: string
+        default: ''
 
 permissions:
   contents: write
@@ -30,6 +34,7 @@ jobs:
           AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
           AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
           LAB_VOICES: ${{ inputs.voices }}
+          LAB_ROUND: ${{ inputs.round }}
         run: node scripts/voice-lab.mjs
       - name: Publish them to the voice-lab branch
         run: |
