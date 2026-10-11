@@ -1,4 +1,5 @@
 # Voice lab: makes a few sample lines with different voice settings so they can be compared
+# (Azure AI Speech, or ElevenLabs with round "eleven", which needs the ELEVENLABS_API_KEY secret)
 # before every clip is remade. Results go to the "voice-lab" branch (not to the website).
 #   GitHub > Actions > "Voice lab" > Run workflow.
 name: Voice lab
@@ -11,7 +12,7 @@ on:
         type: string
         default: ''
       round:
-        description: Which test (empty = voices; "letters" = single Nepali letters; "female" = female voices with the I4 recipe)
+        description: Which test (empty = voices; "letters" = single Nepali letters; "female" = female voices with the I4 recipe; "eleven" = ElevenLabs)
         type: string
         default: ''
 
@@ -33,9 +34,11 @@ jobs:
         env:
           AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
           AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           LAB_VOICES: ${{ inputs.voices }}
           LAB_ROUND: ${{ inputs.round }}
-        run: node scripts/voice-lab.mjs
+        run: |
+          if [ "$LAB_ROUND" = "eleven" ]; then node scripts/voice-lab-eleven.mjs; else node scripts/voice-lab.mjs; fi
       - name: Publish them to the voice-lab branch
         run: |
           git config user.name "github-actions[bot]"
