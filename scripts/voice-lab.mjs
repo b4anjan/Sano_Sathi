@@ -70,9 +70,38 @@ const nepali = voices
 writeFileSync(join(out, 'voices.json'), JSON.stringify({ count: voices.length, nepali }, null, 1));
 console.log(`${voices.length} voices; ${nepali.length} can speak Nepali:`, nepali.map((v) => v.name).join(', '));
 
+// Round "letters": single Nepali letters and letter chants, with ways to help a voice say them.
+const L = (ch, ipa) => ({ L: ch, ipa });
+if (process.env.LAB_ROUND === 'letters') {
+  LINES.splice(0, LINES.length,
+    { id: '1-ka', lang: 'ne', letters: true, parts: [L('क', 'kʌ'), ', कुखुराको ', L('क', 'kʌ')] },
+    { id: '2-a', lang: 'ne', letters: true, parts: [L('अ', 'ʌ'), ', अनारको ', L('अ', 'ʌ')] },
+    { id: '3-jha', lang: 'ne', letters: true, parts: [L('झ', 'dzʱʌ'), ', झण्डाको ', L('झ', 'dzʱʌ')] },
+    { id: '4-nga', lang: 'ne', letters: true, parts: [L('ङ', 'ŋʌ')] },
+    { id: '5-ksha', lang: 'ne', letters: true, parts: [L('क्ष', 'tsʰjʌ')] },
+    { id: '6-sentence', lang: 'ne', text: 'राति भयो। चाँडै सुत्ने बेला भयो!' },
+    { id: '7-hello', lang: 'ne', text: 'म्याउँ! म बिरालो। आऊ, खेलौँ!' },
+    { id: '8-english', lang: 'en', text: 'B! B is for banana.' },
+  );
+  const AND = 'en-US-Andrew:DragonHDLatestNeural';
+  const NEE = 'en-IN-Neerja:DragonHDLatestNeural';
+  VARIANTS.splice(0, VARIANTS.length,
+    { id: 'I1-andrew', desc: 'Andrew HD as before', ne: AND, en: AND, pitch: 0, slow: 0, hq: true, multi: true },
+    { id: 'I2-andrew-ipa', desc: 'Andrew HD, letters given as sounds (pronunciation hint)', ne: AND, en: AND, pitch: 0, slow: 0, hq: true, multi: true, fix: 'ipa' },
+    { id: 'I3-andrew-chars', desc: 'Andrew HD, letters marked as letters', ne: AND, en: AND, pitch: 0, slow: 0, hq: true, multi: true, fix: 'chars' },
+    { id: 'I4-andrew-slow', desc: 'Andrew HD, letter lines 10% slower', ne: AND, en: AND, pitch: 0, slow: 0, letterRate: -10, hq: true, multi: true },
+    { id: 'F1-neerja-8', desc: 'Neerja HD, 8% slower', ne: NEE, en: NEE, pitch: 0, rate: -8, slow: 0, hq: true, multi: true },
+    { id: 'F2-neerja-12', desc: 'Neerja HD, 12% slower', ne: NEE, en: NEE, pitch: 0, rate: -12, slow: 0, hq: true, multi: true },
+    { id: 'C1-hemkala-bright', desc: 'Hemkala, normal speed, pitch +6%', ne: 'ne-NP-HemkalaNeural', en: 'en-US-JennyNeural', pitch: 6, slow: 0, hq: true },
+    { id: 'C2-hemkala-brighter', desc: 'Hemkala, 4% faster, pitch +9%', ne: 'ne-NP-HemkalaNeural', en: 'en-US-JennyNeural', pitch: 9, rate: 4, slow: 0, hq: true },
+    { id: 'H-ava', desc: 'Ava HD (female)', ne: 'en-US-Ava:DragonHDLatestNeural', en: 'en-US-Ava:DragonHDLatestNeural', pitch: 0, slow: 0, hq: true, multi: true },
+  );
+}
+for (const line of LINES) if (line.parts) line.text = line.parts.map((p) => (typeof p === 'string' ? p : p.L)).join('');
+
 // Multilingual voices to try: LAB_VOICES (comma list) or, by default, the first three.
-const wanted = (process.env.LAB_VOICES || '').split(',').map((s) => s.trim()).filter(Boolean);
-const pickList = wanted.length ? nepali.filter((x) => wanted.includes(x.name)) : nepali.filter((x) => !x.locale.startsWith('ne')).slice(0, 3);
+const wanted = process.env.LAB_ROUND === 'letters' ? [] : (process.env.LAB_VOICES || '').split(',').map((s) => s.trim()).filter(Boolean);
+const pickList = process.env.LAB_ROUND === 'letters' ? [] : wanted.length ? nepali.filter((x) => wanted.includes(x.name)) : nepali.filter((x) => !x.locale.startsWith('ne')).slice(0, 3);
 if (wanted.length) {
   // A focused round: keep only today's voice and the clean native voices for reference.
   VARIANTS.splice(0, VARIANTS.length, ...VARIANTS.filter((v) => ['A-now-cat', 'B-hemkala-clean', 'D-sagar-clean'].includes(v.id)));
@@ -84,9 +113,13 @@ for (const v of pickList) {
 const pct = (n) => `${n >= 0 ? '+' : ''}${n}%`;
 function ssml(v, line) {
   const voice = line.lang === 'ne' ? v.ne : v.en;
-  const rate = (v.rate || 0) + (line.word ? v.slow : 0);
+  const rate = (v.rate || 0) + (line.word ? v.slow : 0) + (line.letters ? v.letterRate || 0 : 0);
   const xl = line.lang === 'ne' ? 'ne-NP' : 'en-US';
-  let body = esc(line.text);
+  let body = line.parts
+    ? line.parts
+        .map((p) => (typeof p === 'string' ? esc(p) : v.fix === 'ipa' ? `<phoneme alphabet="ipa" ph="${p.ipa}">${esc(p.L)}</phoneme>` : v.fix === 'chars' ? `<say-as interpret-as="characters">${esc(p.L)}</say-as>` : esc(p.L)))
+        .join('')
+    : esc(line.text);
   if (rate || v.pitch) body = `<prosody rate="${pct(rate)}" pitch="${pct(v.pitch)}">${body}</prosody>`;
   if (v.multi) body = `<lang xml:lang="${xl}">${body}</lang>`;
   return `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${xl}"><voice name="${voice}"><mstts:silence type="Leading-exact" value="50ms"/><mstts:silence type="Tailing-exact" value="150ms"/>${body}</voice></speak>`;
