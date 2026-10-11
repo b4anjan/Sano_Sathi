@@ -8,8 +8,9 @@ import { activityById } from '../content/activities';
 import { BRAND } from '../brand';
 import { Bi } from './common';
 
-function titleFor(s: Screen): BiText {
-  if (s === 'home') return { en: BRAND.appName, ne: BRAND.appNameNe };
+/** The screen's name for the top bar. None on home: the big felt name is right below it. */
+function titleFor(s: Screen): BiText | null {
+  if (s === 'home') return null;
   if (s === 'studio') return { en: 'Voice studio', ne: 'आवाज स्टुडियो' };
   if (s === 'stickers') return S.stickers;
   return activityById(s)?.title ?? { en: BRAND.appName, ne: BRAND.appNameNe };
@@ -119,6 +120,7 @@ export function Rail() {
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
+  const title = titleFor(screen.value);
   const langTag = lang.value === 'en' ? 'EN' : lang.value === 'ne' ? 'ने' : 'ने · EN';
 
   return (
@@ -146,9 +148,7 @@ export function Rail() {
           <small>{S.hold.en}</small>
         </span>
       </button>
-      <div class="rail-title">
-        <Bi t={titleFor(screen.value)} />
-      </div>
+      <div class="rail-title">{title && <Bi t={title} />}</div>
       <div class="rail-right">
         {homeButton.value && screen.value !== 'home' && screen.value !== 'studio' && <HomeHold />}
         <span class="lang-tag" aria-label="Language">{langTag}</span>
