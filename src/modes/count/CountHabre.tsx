@@ -2,17 +2,18 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { lang, countLevel } from '../../core/settings';
 import { unlockAudio, mallet, bloop, cheer, PENTA } from '../../core/audio';
 import { say, stopSpeech, type Part } from '../../core/voice';
-import { EN_NUM, NE_NUM, NE_COUNTED, neDigits } from '../../content/numbers';
+import { EN_NUM, NE_NUM, neDigits } from '../../content/numbers';
 import { S, wantText, type Bi as BiText } from '../../content/strings';
+import { COUNT_LINES } from '../../content/spoken';
 import { Bi, ItemArt, Stars, burst } from '../../ui/common';
 import { Buddy } from '../../ui/Buddy';
 import { award } from '../../core/rewards';
-const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-const oranges = (n: number) => (n === 1 ? 'orange' : 'oranges');
 
-function parts(t: BiText, clipKey?: string): Part[] {
-  const ne: Part = { text: t.ne, lang: 'ne', clips: clipKey ? [`ne/${clipKey}`] : undefined };
-  const en: Part = { text: t.en, lang: 'en', clips: clipKey ? [`en/${clipKey}`] : undefined };
+/** One sentence per language; `keys` are its recorded pieces, played back to back. */
+function parts(t: BiText, keys?: string | string[]): Part[] {
+  const ks = keys === undefined ? [] : Array.isArray(keys) ? keys : [keys];
+  const ne: Part = { text: t.ne, lang: 'ne', clips: ks.length ? ks.map((k) => `ne/${k}`) : undefined };
+  const en: Part = { text: t.en, lang: 'en', clips: ks.length ? ks.map((k) => `en/${k}`) : undefined };
   return lang.value === 'en' ? [en] : lang.value === 'ne' ? [ne] : [ne, en];
 }
 const numText = (n: number): BiText => ({ en: EN_NUM[n], ne: NE_NUM[n] });
@@ -49,9 +50,9 @@ export function CountHabre() {
     timers.current = [];
   };
   const later = (fn: () => void, ms: number) => timers.current.push(window.setTimeout(fn, ms));
-  const tell = (t: BiText, clipKey?: string) => {
+  const tell = (t: BiText, clipKeys?: string | string[]) => {
     setMsg(t);
-    void say(parts(t, clipKey));
+    void say(parts(t, clipKeys));
   };
 
   const newRound = () => {
@@ -126,10 +127,7 @@ export function CountHabre() {
       setEating(true);
       cheer();
       if (hostRef.current && habreRef.current) burst(hostRef.current, habreRef.current, 22);
-      tell({
-        en: `Yum! ${cap(EN_NUM[t])} ${oranges(t)}. Thank you!`,
-        ne: `मीठो! ${NE_COUNTED[t]} सुन्तला। धन्यवाद!`,
-      });
+      tell(COUNT_LINES.yum(t), `yum-${t}`);
       setStars((s) => s + 1);
       award(1);
       later(newRound, 3000);
@@ -150,10 +148,14 @@ export function CountHabre() {
     later(() => {
       const d = Math.abs(t - p);
       const more = p < t;
-      tell({
-        en: `That's ${EN_NUM[p]}. I want ${EN_NUM[t]}. ${more ? `Let's add ${EN_NUM[d]} more.` : `Let's take ${EN_NUM[d]} away.`}`,
-        ne: `यहाँ ${NE_COUNTED[p]} छ। मलाई ${NE_COUNTED[t]} चाहियो। ${more ? `अझै ${NE_COUNTED[d]} थपौँ।` : `${NE_COUNTED[d]} झिकौँ।`}`,
-      });
+      // Three recorded sentences: "That's two." "I want five oranges." "Let's add three more."
+      const have = COUNT_LINES.have(p);
+      const want = wantText(t);
+      const next = more ? COUNT_LINES.addMore(d) : COUNT_LINES.takeAway(d);
+      tell(
+        { en: `${have.en} ${want.en} ${next.en}`, ne: `${have.ne} ${want.ne} ${next.ne}` },
+        [`have-${p}`, `want-${t}`, `${more ? 'addmore' : 'takeaway'}-${d}`],
+      );
       setNudge(more ? 'doko' : 'plate');
       setLocked(false);
     }, 1300 + p * step + 200);

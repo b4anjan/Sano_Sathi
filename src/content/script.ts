@@ -1,10 +1,11 @@
 import { ITEMS } from './items';
 import { EN_NUM, NE_NUM, neDigits } from './numbers';
-import { EN_LETTERS, NE_VOWELS, NE_CONSONANTS } from './letters';
+import { EN_LETTERS, NE_VOWELS, NE_CONSONANTS, glossItem } from './letters';
 import { S, SPOKEN_S, PHRASES, wantText } from './strings';
 import { COLORS, SHAPES } from './shapes';
 import { BUDDIES, BUDDY_IDS, GREETINGS } from './buddies';
 import { CH, CH_HINT, PIECE_NAMES, type ChLine } from './chess';
+import { MAX_NUM, numSay, spokenLines } from './spoken';
 
 /** Scene words in My Village that are not picture items (clip key w-<id>). Kept here so the
  *  studio and the village agree; the village imports this list. */
@@ -35,6 +36,8 @@ export interface Line {
   hint?: string;
   /** Item picture to show, if any. */
   art?: string;
+  /** Read it letter by letter ("B" as "bee"), for the AI voice. */
+  sayAs?: 'characters';
 }
 
 export const GROUPS: Array<{ id: Group; en: string; ne: string }> = [
@@ -82,11 +85,13 @@ export function scriptFor(l: RecLang): Line[] {
     out.push({ key: `w-${id}`, group: 'words', text: w[l], hint: `My Village · ${l === 'ne' ? w.en : w.ne}` });
   }
 
-  for (let n = 0; n <= 20; n++) {
+  for (let n = 0; n <= MAX_NUM; n++) {
+    // Up to 20 as words; above that as digits (Math Quest and the shop need them; the
+    // voices read digits as proper number words).
     out.push(
       l === 'ne'
-        ? { key: `num${n}`, group: 'numbers', text: NE_NUM[n], hint: `${neDigits(n)} · ${n} · ${EN_NUM[n]}` }
-        : { key: `num${n}`, group: 'numbers', text: EN_NUM[n], hint: `${n} · ${NE_NUM[n]}` },
+        ? { key: `num${n}`, group: 'numbers', text: numSay(n, 'ne'), hint: n <= 20 ? `${neDigits(n)} · ${n} · ${EN_NUM[n]}` : `${n}` }
+        : { key: `num${n}`, group: 'numbers', text: numSay(n, 'en'), hint: n <= 20 ? `${n} · ${NE_NUM[n]}` : neDigits(n) },
     );
   }
 
@@ -104,12 +109,15 @@ export function scriptFor(l: RecLang): Line[] {
     { key: '_yourTurn', group: 'sentences', text: PHRASES.yourTurn[l], hint: 'Copy Me: when the child should copy' },
     { key: '_levelUp', group: 'sentences', text: PHRASES.levelUp[l], hint: 'Copy Me: when a level is finished' },
     { key: '_oops', group: 'sentences', text: PHRASES.oops[l], hint: 'Copy Me: after a wrong block' },
+    { key: '_whereGo', group: 'sentences', text: PHRASES.whereGo[l], hint: 'Shapes & Colors: after naming the shape' },
+    { key: '_otherBasket', group: 'sentences', text: PHRASES.otherBasket[l], hint: 'Shapes & Colors: wrong basket' },
   );
   for (const [k, g] of Object.entries(GREETINGS)) {
     out.push({ key: `_${k}`, group: 'sentences', text: g[l], hint: k === 'late' ? 'Home: after 8 in the evening' : `Home: greeting in the ${k}` });
   }
   for (const k of SPOKEN_S) out.push({ key: `s-${k}`, group: 'sentences', text: S[k][l], hint: USE_HINT[k] });
   for (const k of Object.keys(CH) as ChLine[]) out.push({ key: `ch-${k}`, group: 'sentences', text: CH[k][l], hint: CH_HINT[k] });
+  for (const [key, text, hint] of spokenLines(l)) out.push({ key, group: 'sentences', text, hint });
   for (let n = 1; n <= 10; n++) {
     out.push({ key: `want-${n}`, group: 'sentences', text: wantText(n)[l], hint: n <= 3 ? 'Counting: level 1 and up' : n <= 5 ? 'Counting: level 2 and up' : 'Counting: level 3' });
   }
@@ -131,6 +139,17 @@ export function scriptFor(l: RecLang): Line[] {
     for (const r of [...b.reactions, b.tickle]) {
       out.push({ key: `m-${id}-${r.id}`, group: 'buddies', text: r.say[l], hint: `${who} · when tapped${r.id === 'tickle' ? ' fast' : ''}`, art: b.art });
     }
+  }
+
+  // A letter's word in the other language ("A is for apple" → स्याउ), when no picture word
+  // already has a clip for it.
+  const glossFrom = l === 'ne' ? EN_LETTERS : [...NE_VOWELS, ...NE_CONSONANTS];
+  for (const L of glossFrom) {
+    if (!L.gloss || glossItem(L, l)) continue;
+    out.push({ key: `gl-${L.ch}`, group: 'words', text: L.gloss, hint: `Letters: the word for ${L.ch} (${L.word}) in ${l === 'ne' ? 'Nepali' : 'English'}` });
+  }
+  if (l === 'en') {
+    for (const L of EN_LETTERS) out.push({ key: `ln-${L.ch}`, group: 'letters', text: L.ch, hint: 'Bubble Pop: just the letter name', sayAs: 'characters' });
   }
 
   if (l === 'ne') {

@@ -4,6 +4,7 @@ import { unlockAudio, cheer, bloop, sfx, mallet, PENTA } from '../../core/audio'
 import { say, stopSpeech, type Part } from '../../core/voice';
 import { award } from '../../core/rewards';
 import { SHAPES, COLORS, shapeSVG } from '../../content/shapes';
+import { PHRASES } from '../../content/strings';
 import { Bi, Stars, burst } from '../../ui/common';
 import { Buddy } from '../../ui/Buddy';
 
@@ -58,15 +59,15 @@ export function Shapes() {
   const l = lang.value;
 
   const later = (fn: () => void, ms: number) => timers.current.push(window.setTimeout(fn, ms));
-  const pieceParts = (p: Piece, tail?: { en: string; ne: string }): Part[] => {
+  const pieceParts = (p: Piece, tail?: { en: string; ne: string; key: string }): Part[] => {
     const sh = SHAPES.find((s) => s.id === p.shape)!;
     const ne: Part[] = [
       { text: `${p.color.ne} ${sh.ne}`, lang: 'ne', clips: [`ne/${colorKey(p.color)}`, `ne/${shapeKey(p.shape)}`] },
-      ...(tail ? [{ text: tail.ne, lang: 'ne' as const }] : []),
+      ...(tail ? [{ text: tail.ne, lang: 'ne' as const, clips: [`ne/${tail.key}`] }] : []),
     ];
     const en: Part[] = [
       { text: `${p.color.en} ${sh.en}`, lang: 'en', clips: [`en/${colorKey(p.color)}`, `en/${shapeKey(p.shape)}`] },
-      ...(tail ? [{ text: tail.en, lang: 'en' as const }] : []),
+      ...(tail ? [{ text: tail.en, lang: 'en' as const, clips: [`en/${tail.key}`] }] : []),
     ];
     return l === 'en' ? en : l === 'ne' ? ne : [...ne, ...en];
   };
@@ -79,7 +80,7 @@ export function Shapes() {
     setSorted({});
     setCount(0);
     busy.current = false;
-    later(() => void say(pieceParts(p, { en: 'Where does it go?', ne: 'कहाँ राख्ने?' })), 400);
+    later(() => void say(pieceParts(p, { ...PHRASES.whereGo, key: '_whereGo' })), 400);
   };
 
   useEffect(() => {
@@ -125,7 +126,7 @@ export function Shapes() {
       bloop(420, 300, 0.14);
       setBack(true);
       later(() => setBack(false), 450);
-      void say(pieceParts(piece, { en: 'Try another basket.', ne: 'अर्को डालो हेर।' }));
+      void say(pieceParts(piece, { ...PHRASES.otherBasket, key: '_otherBasket' }));
     }
   };
 
@@ -158,7 +159,7 @@ export function Shapes() {
     start.current = null;
     if (!s) return;
     if (!s.moved) {
-      void say(pieceParts(piece, { en: 'Where does it go?', ne: 'कहाँ राख्ने?' }));
+      void say(pieceParts(piece, { ...PHRASES.whereGo, key: '_whereGo' }));
       return;
     }
     const b = binAt(e.clientX, e.clientY);

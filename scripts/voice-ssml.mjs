@@ -38,7 +38,8 @@ export function buildSsml(job) {
   if (!v) throw new Error(`No voice for ${job.buddy}/${job.lang}`);
   const rate = v.rate + (SLOW_GROUPS.has(job.group) ? SLOWER : 0);
   const xmlLang = job.lang === 'ne' ? 'ne-NP' : 'en-US';
-  let body = `<prosody rate="${pct(rate)}" pitch="${pct(v.pitch)}">${escapeXml(job.text)}</prosody>`;
+  const said = job.sayAs === 'characters' ? `<say-as interpret-as="characters">${escapeXml(job.text)}</say-as>` : escapeXml(job.text);
+  let body = `<prosody rate="${pct(rate)}" pitch="${pct(v.pitch)}">${said}</prosody>`;
   if (v.style) body = `<mstts:express-as style="${v.style}">${body}</mstts:express-as>`;
   return (
     `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${xmlLang}">` +

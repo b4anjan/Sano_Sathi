@@ -29,7 +29,7 @@ interface Thing {
 
 function things(mode: Mode, l: string): Thing[] {
   const one = (p: Part) => () => [p];
-  const abc = EN_LETTERS.map((L) => ({ key: `en-${L.ch}`, label: L.ch, parts: one({ text: L.say, lang: 'en' }) }));
+  const abc = EN_LETTERS.map((L) => ({ key: `en-${L.ch}`, label: L.ch, parts: one({ text: L.say, lang: 'en', clips: [`en/ln-${L.ch}`] }) }));
   const kakha = NE_CONSONANTS.slice(0, 25).map((L) => ({ key: `ne-${L.ch}`, label: L.ch, parts: one({ text: L.ch, lang: 'ne', clips: [`ne/letter-${L.ch}`] }) }));
   const num = Array.from({ length: 10 }, (_, i) => i + 1).map((n) => ({
     key: `n-${n}`,

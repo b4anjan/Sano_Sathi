@@ -5,6 +5,8 @@
  * the order Nepali children chant them in: "क कुखुराको क, ख खेतको ख…".
  * Words were chosen to reuse our pictures where possible; all need a native speaker's review.
  */
+import { itemById } from './items';
+
 export interface Letter {
   ch: string;
   /** How to say the letter's name aloud (English letter names; Nepali is the letter itself). */
@@ -49,3 +51,9 @@ export const NE_CONSONANT_ROWS: Letter[][] = [
   [L('क्ष', 'क्ष'), L('त्र', 'त्र', 'त्रिशूल', 'trident'), L('ज्ञ', 'ज्ञ', 'ज्ञान', 'knowledge')],
 ];
 export const NE_CONSONANTS = NE_CONSONANT_ROWS.flat();
+
+/** The letter's word in the other language reuses a picture word's recording when it is the same word. */
+export function glossItem(L: Letter, l: 'en' | 'ne'): string | undefined {
+  const it = L.art ? itemById(L.art) : undefined;
+  return it && it[l] === L.gloss ? it.id : undefined;
+}

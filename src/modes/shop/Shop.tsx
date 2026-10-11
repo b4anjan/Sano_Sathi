@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { lang, shopLevel, type Level } from '../../core/settings';
 import { unlockAudio, cheer, bloop, sfx, mallet } from '../../core/audio';
-import { say, stopSpeech, type Part } from '../../core/voice';
+import { say, saidParts, stopSpeech } from '../../core/voice';
+import { GOODS, shopAlmostSaid, shopAskSaid, shopChangeIsSaid, shopChangeSaid, shopThanksSaid, shopTooMuchSaid } from '../../content/spoken';
 import { award } from '../../core/rewards';
 import { itemById, type Item } from '../../content/items';
 import { neDigits } from '../../content/numbers';
@@ -14,7 +15,6 @@ import { SpeakerIcon } from '../letters/Letters';
  * the buddy names with felt coins and notes, exactly. Level 3 adds "how much change?".
  * Money is generic felt, not a copy of real notes.
  */
-const GOODS = ['aanp', 'kera', 'suntala', 'golbheda', 'mula', 'makai', 'syau', 'chappal', 'chhata', 'changa', 'doko', 'gagri', 'dhaka-topi', 'madal'];
 const MONEY: Record<Level, number[]> = { 1: [1, 2, 5], 2: [1, 2, 5, 10, 20], 3: [1, 2, 5, 10, 20, 50] };
 const PRICE: Record<Level, [number, number]> = { 1: [2, 10], 2: [6, 30], 3: [11, 99] };
 const LOOK: Record<number, { bg: string; ink: string; note: boolean }> = {
@@ -89,11 +89,8 @@ export function Shop() {
   const total = tray.reduce((a, b) => a + b, 0);
 
   const later = (fn: () => void, ms: number) => timers.current.push(window.setTimeout(fn, ms));
-  const parts = (t: { en: string; ne: string }): Part[] => {
-    const ne: Part = { text: t.ne, lang: 'ne' };
-    const en: Part = { text: t.en, lang: 'en' };
-    return l === 'en' ? [en] : l === 'ne' ? [ne] : [ne, en];
-  };
+  /** The question, spoken from recorded pieces (item, price, "can you pay?"). */
+  const askSaid = (t: Task) => (t.kind === 'pay' ? shopAskSaid(t.target, t.prices[t.target]) : shopChangeSaid(t.target, t.prices[t.target], t.paidWith));
   const prompt = (t: Task): { en: string; ne: string } => {
     const g = itemById(t.target)!;
     const p = t.prices[t.target];
@@ -112,7 +109,7 @@ export function Shop() {
     setMsg(null);
     setDone(false);
     setTries(0);
-    later(() => void say(parts(prompt(t))), 300);
+    later(() => void say(saidParts(askSaid(t), lang.value)), 300);
   };
 
   useEffect(() => {
@@ -131,7 +128,7 @@ export function Shop() {
     setStars((s) => s + 1);
     if (hostRef.current && trayRef.current) burst(hostRef.current, trayRef.current, 20);
     setMsg({ en: 'Thank you! Here you go.', ne: 'धन्यवाद! लेऊ।' });
-    void say(parts({ en: `Thank you! Here is your ${it.en}.`, ne: `धन्यवाद! यो लेऊ तिम्रो ${it.ne}।` }));
+    void say(saidParts(shopThanksSaid(it.id), l));
     later(() => start(level), 2800);
   };
 
@@ -146,7 +143,7 @@ export function Shop() {
     else if (t > price) {
       bloop(420, 300, 0.16);
       setMsg({ en: 'Too much! Tap money in the tray to take it back.', ne: 'धेरै भयो! फिर्ता लिन थालमा पैसा थिच।' });
-      void say(parts({ en: 'Oops, too much! Take some back.', ne: 'ओहो, धेरै भयो! अलिकति फिर्ता लेऊ।' }));
+      void say(saidParts(shopTooMuchSaid(), l));
     } else setMsg(null);
   };
 
@@ -174,11 +171,11 @@ export function Shop() {
         bloop(420, 300, 0.16);
         setInput('');
         setMsg({ en: `Almost! Count up from ${price} to ${task.paidWith}.`, ne: `झन्डै! ${neDigits(price)} देखि ${neDigits(task.paidWith)} सम्म गन।` });
-        void say(parts({ en: `Almost! Count up from ${price} to ${task.paidWith}.`, ne: `झन्डै! ${neDigits(price)} देखि ${neDigits(task.paidWith)} सम्म गन।` }));
+        void say(saidParts(shopAlmostSaid(price, task.paidWith), l));
       } else {
         setInput(String(task.paidWith - price));
         setMsg({ en: `The change is ${task.paidWith - price} rupees.`, ne: `फिर्ता ${neDigits(task.paidWith - price)} रुपैयाँ।` });
-        void say(parts({ en: `The change is ${task.paidWith - price} rupees.`, ne: `फिर्ता ${neDigits(task.paidWith - price)} रुपैयाँ।` }));
+        void say(saidParts(shopChangeIsSaid(task.paidWith - price), l));
         setDone(true);
         later(() => start(level), 3600);
       }
@@ -212,7 +209,7 @@ export function Shop() {
 
       <div class="shop-talk">
         <Buddy class="habre-small" />
-        <button type="button" class="bubble left shop-ask" onClick={() => void say(parts(p))}>
+        <button type="button" class="bubble left shop-ask" onClick={() => void say(saidParts(askSaid(task), l))}>
           <SpeakerIcon />
           <span>
             <Bi t={msg ?? p} />

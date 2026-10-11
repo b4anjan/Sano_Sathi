@@ -128,8 +128,10 @@ export function Smash() {
     spawn(`${shapeSVG(s.id, c.hex)}<span class="chip" style="--c-ink:${c.hex}"><span class="w"><b>${esc(name)}</b></span></span>`, c.hex, name, at);
     bloop(240 + Math.random() * 120, 520 + Math.random() * 300, 0.16);
     const parts: Part[] = [];
-    if (l !== 'en') parts.push({ text: `${c.ne} ${s.ne}!`, lang: 'ne' });
-    if (l !== 'ne') parts.push({ text: `${c.en} ${s.en}!`, lang: 'en' });
+    // Colour + shape, each its own recording (same clips as Shapes & Colors).
+    const keys = (x: 'en' | 'ne') => [`${x}/color-${c.en.replace(/\s+/g, '-')}`, `${x}/shape-${s.id}`];
+    if (l !== 'en') parts.push({ text: `${c.ne} ${s.ne}!`, lang: 'ne', clips: keys('ne') });
+    if (l !== 'ne') parts.push({ text: `${c.en} ${s.en}!`, lang: 'en', clips: keys('en') });
     speak(parts);
   };
 

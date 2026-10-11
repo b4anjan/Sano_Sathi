@@ -1,12 +1,11 @@
 import type { Part } from '../../core/voice';
 import type { Lang } from '../../core/settings';
-import { itemById } from '../../content/items';
-import type { Letter } from '../../content/letters';
+import { glossItem, type Letter } from '../../content/letters';
 
-/** The letter's word in the other language can reuse that item's recording when it is the same word. */
-function glossClip(L: Letter, l: 'en' | 'ne'): string[] | undefined {
-  const it = L.art ? itemById(L.art) : undefined;
-  return it && it[l] === L.gloss ? [`${l}/${it.id}`] : undefined;
+/** The letter's word in the other language: a picture word's clip, or its own (gl-<letter>). */
+function glossClip(L: Letter, l: 'en' | 'ne'): string[] {
+  const id = glossItem(L, l);
+  return [`${l}/${id ?? `gl-${L.ch}`}`];
 }
 
 /**

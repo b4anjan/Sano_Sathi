@@ -257,6 +257,16 @@ export async function say(parts: Part[]): Promise<boolean> {
   return audible;
 }
 
+/**
+ * Parts for a sentence joined from recorded pieces (content/spoken.ts): one part per
+ * language, its clips played back to back, its full text kept for the device voice if a
+ * piece is ever missing.
+ */
+export function saidParts(s: { en: Array<{ key: string; text: string }>; ne: Array<{ key: string; text: string }> }, l: 'en' | 'ne' | 'both'): Part[] {
+  const one = (x: SpeechLang): Part => ({ text: s[x].map((g) => g.text).join(' '), lang: x, clips: s[x].map((g) => `${x}/${g.key}`) });
+  return l === 'en' ? [one('en')] : l === 'ne' ? [one('ne')] : [one('ne'), one('en')];
+}
+
 /** Play one clip at full volume, ignoring the "spoken words" switch (used by the Voice Studio). */
 export function playKey(key: string): Promise<boolean> {
   stopSpeech();

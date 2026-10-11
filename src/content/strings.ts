@@ -79,6 +79,8 @@ export const PHRASES = {
   yourTurn: { en: 'Your turn!', ne: 'अब तिम्रो पालो!' },
   levelUp: { en: 'Level complete!', ne: 'तह पूरा भयो!' },
   oops: { en: 'Oops! Watch again.', ne: 'ओहो! फेरि हेर।' },
+  whereGo: { en: 'Where does it go?', ne: 'कहाँ राख्ने?' },
+  otherBasket: { en: 'Try another basket.', ne: 'अर्को डालो हेर।' },
 } satisfies Record<string, Bi>;
 
 const oranges = (n: number) => (n === 1 ? 'orange' : 'oranges');

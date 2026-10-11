@@ -13,6 +13,7 @@ export interface VoiceJob {
   key: string;
   group: Group;
   text: string;
+  sayAs?: 'characters';
 }
 
 export function voiceJobs(): VoiceJob[] {
@@ -23,7 +24,7 @@ export function voiceJobs(): VoiceJob[] {
         // Each buddy says only its own hello and reactions.
         if (line.group === 'buddies' && !line.key.startsWith(`m-${buddy}-`)) continue;
         const text = lang === 'en' ? respellForEnglish(line.text) : line.text;
-        out.push({ buddy, lang, key: line.key, group: line.group, text });
+        out.push({ buddy, lang, key: line.key, group: line.group, text, ...(line.sayAs ? { sayAs: line.sayAs } : {}) });
       }
     }
   }

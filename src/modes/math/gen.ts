@@ -1,6 +1,7 @@
 import type { Level } from '../../core/settings';
 import { neDigits } from '../../content/numbers';
 import type { Bi } from '../../content/strings';
+import type { MathSay } from '../../content/spoken';
 
 /**
  * Math Quest problems for ages 6–8, in five kinds and three levels.
@@ -26,7 +27,10 @@ export interface Problem {
   a: number;
   b: number;
   c: number;
+  /** On-screen words. */
   say: Bi;
+  /** The same sentence as recorded pieces (content/spoken.ts). */
+  spoken: MathSay;
 }
 
 type Rnd = () => number;
@@ -68,51 +72,55 @@ function sub(level: Level, rnd: Rnd): [number, number] {
 export function makeProblem(op: Op, level: Level, rnd: Rnd = Math.random): Problem {
   if (op === 'add') {
     const [a, b] = add(level, rnd);
-    return { op, a, b, c: a + b, answer: a + b, show: [`${a}`, '+', `${b}`, '=', '?'], say: { en: `${a} plus ${b} makes?`, ne: `${nd(a)} जोड ${nd(b)} कति हुन्छ?` } };
+    return { op, a, b, c: a + b, answer: a + b, show: [`${a}`, '+', `${b}`, '=', '?'], say: { en: `${a} plus ${b} makes?`, ne: `${nd(a)} जोड ${nd(b)} कति हुन्छ?` }, spoken: { kind: 'add', a, b } };
   }
   if (op === 'sub') {
     const [a, b] = sub(level, rnd);
-    return { op, a, b, c: a - b, answer: a - b, show: [`${a}`, '−', `${b}`, '=', '?'], say: { en: `${a} take away ${b} leaves?`, ne: `${nd(a)} घटाउ ${nd(b)} कति हुन्छ?` } };
+    return { op, a, b, c: a - b, answer: a - b, show: [`${a}`, '−', `${b}`, '=', '?'], say: { en: `${a} take away ${b} leaves?`, ne: `${nd(a)} घटाउ ${nd(b)} कति हुन्छ?` }, spoken: { kind: 'sub', a, b } };
   }
   if (op === 'mul') {
     const t = pick(rnd, TABLES[level]);
     const k = int(rnd, 1, 10);
     const [a, b] = rnd() < 0.5 ? [t, k] : [k, t];
-    return { op, a, b, c: a * b, answer: a * b, show: [`${a}`, '×', `${b}`, '=', '?'], say: { en: `${a} times ${b} makes?`, ne: `${nd(a)} गुणा ${nd(b)} कति हुन्छ?` } };
+    return { op, a, b, c: a * b, answer: a * b, show: [`${a}`, '×', `${b}`, '=', '?'], say: { en: `${a} times ${b} makes?`, ne: `${nd(a)} गुणा ${nd(b)} कति हुन्छ?` }, spoken: { kind: 'mul', a, b } };
   }
   if (op === 'missing') {
     const form = level === 1 ? 0 : level === 2 ? int(rnd, 0, 2) : int(rnd, 0, 3);
     if (form === 3) {
       const t = pick(rnd, [2, 5, 10]);
       const k = int(rnd, 2, 10);
-      return { op, a: k, b: t, c: k * t, answer: k, show: ['?', '×', `${t}`, '=', `${k * t}`], say: { en: `What times ${t} makes ${k * t}?`, ne: `कतिलाई ${nd(t)} ले गुणा गर्दा ${nd(k * t)} हुन्छ?` } };
+      return { op, a: k, b: t, c: k * t, answer: k, show: ['?', '×', `${t}`, '=', `${k * t}`], say: { en: `What times ${t} makes ${k * t}?`, ne: `कतिलाई ${nd(t)} ले गुणा गर्दा ${nd(k * t)} हुन्छ?` }, spoken: { kind: 'whatTimes', t, c: k * t } };
     }
     const [a, b] = level === 3 ? add(3, rnd) : add(level === 1 ? 1 : rnd() < 0.5 ? 1 : 2, rnd);
     const c = a + b;
-    if (form === 0) return { op, a, b, c, answer: b, show: [`${a}`, '+', '?', '=', `${c}`], say: { en: `${a} plus what makes ${c}?`, ne: `${nd(a)} मा कति जोड्दा ${nd(c)} हुन्छ?` } };
-    if (form === 1) return { op, a, b, c, answer: a, show: ['?', '+', `${b}`, '=', `${c}`], say: { en: `What plus ${b} makes ${c}?`, ne: `कतिमा ${nd(b)} जोड्दा ${nd(c)} हुन्छ?` } };
-    return { op, a: c, b, c: a, answer: b, show: [`${c}`, '−', '?', '=', `${a}`], say: { en: `${c} take away what leaves ${a}?`, ne: `${nd(c)} बाट कति घटाउँदा ${nd(a)} हुन्छ?` } };
+    if (form === 0) return { op, a, b, c, answer: b, show: [`${a}`, '+', '?', '=', `${c}`], say: { en: `${a} plus what makes ${c}?`, ne: `${nd(a)} मा कति जोड्दा ${nd(c)} हुन्छ?` }, spoken: { kind: 'plusWhat', a, c } };
+    if (form === 1) return { op, a, b, c, answer: a, show: ['?', '+', `${b}`, '=', `${c}`], say: { en: `What plus ${b} makes ${c}?`, ne: `कतिमा ${nd(b)} जोड्दा ${nd(c)} हुन्छ?` }, spoken: { kind: 'whatPlus', b, c } };
+    return { op, a: c, b, c: a, answer: b, show: [`${c}`, '−', '?', '=', `${a}`], say: { en: `${c} take away what leaves ${a}?`, ne: `${nd(c)} बाट कति घटाउँदा ${nd(a)} हुन्छ?` }, spoken: { kind: 'minusWhat', a: c, c: a } };
   }
   // compare
   let left: number;
   let right: number;
   let leftShow: string;
+  let leftParts: number[];
   if (level === 3) {
     const [a, b] = add(rnd() < 0.5 ? 1 : 2, rnd);
     left = a + b;
     right = rnd() < 0.25 ? left : left + pick(rnd, [-3, -2, -1, 1, 2, 3]);
     leftShow = `${a}+${b}`;
+    leftParts = [a, b];
   } else {
     const hi = level === 1 ? 20 : 99;
     left = int(rnd, level === 1 ? 0 : 10, hi);
     right = rnd() < 0.2 ? left : int(rnd, level === 1 ? 0 : 10, hi);
     leftShow = `${left}`;
+    leftParts = [left];
   }
   const answer: Sign = left < right ? '<' : left > right ? '>' : '=';
   const ls = leftShow.replace(/\d+/g, (d) => nd(Number(d)));
   return {
     op, a: left, b: right, c: 0, answer, show: [leftShow, '?', `${right}`],
     say: { en: `Is ${leftShow.replace('+', ' plus ')} bigger than, smaller than, or the same as ${right}?`, ne: `${ls.replace('+', ' जोड ')}, ${nd(right)} भन्दा ठूलो, सानो कि बराबर?` },
+    spoken: { kind: 'compare', left: leftParts, right },
   };
 }
 

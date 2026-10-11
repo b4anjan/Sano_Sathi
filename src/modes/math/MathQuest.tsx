@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { lang, mathLevel, type Level } from '../../core/settings';
 import { unlockAudio, cheer, bloop, mallet, sfx } from '../../core/audio';
-import { say, stopSpeech, type Part } from '../../core/voice';
+import { say, saidParts, stopSpeech, type Part } from '../../core/voice';
+import { answerSaid, mathDoneLine, mathSaid } from '../../content/spoken';
 import { award } from '../../core/rewards';
 import { neDigits } from '../../content/numbers';
 import { S } from '../../content/strings';
@@ -107,7 +108,7 @@ export function MathQuest() {
   };
   useEffect(() => () => (clear(), stopSpeech()), []);
 
-  const ask = (q: Problem) => void say(biParts(q.say, lang.value));
+  const ask = (q: Problem) => void say(saidParts(mathSaid(q.spoken), lang.value));
 
   const fresh = (o: Op, lv: Level, restart = false) => {
     clear();
@@ -134,7 +135,7 @@ export function MathQuest() {
       cheer();
       award(2);
       const f = firstRef.current;
-      void say(biParts({ en: `Great work! You got ${f} right first time.`, ne: `स्याबास! तिमीले ${neDigits(f)} वटा पहिलो पटकमै मिलायौ।` }, lang.value));
+      void say(biParts(mathDoneLine(f), lang.value, `mq-done-${f}`));
       return;
     }
     setN((x) => x + 1);
@@ -168,8 +169,7 @@ export function MathQuest() {
       setHint(true);
       setInput(String(p.answer));
       bloop(500, 380, 0.2);
-      const ans = typeof p.answer === 'number' ? p.answer : p.answer;
-      void say(biParts({ en: `The answer is ${ans === '<' ? 'smaller' : ans === '>' ? 'bigger' : ans === '=' ? 'the same' : ans}.`, ne: `उत्तर ${ans === '<' ? 'सानो' : ans === '>' ? 'ठूलो' : ans === '=' ? 'बराबर' : neDigits(ans as number)} हो।` }, lang.value));
+      void say(saidParts(answerSaid(p.answer), lang.value));
     }
   };
 
