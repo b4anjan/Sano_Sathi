@@ -1,0 +1,36 @@
+# Voice lab: makes a few sample lines with different voice settings so they can be compared
+# before every clip is remade. Results go to the "voice-lab" branch (not to the website).
+#   GitHub > Actions > "Voice lab" > Run workflow.
+name: Voice lab
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+      - name: Make sure ffmpeg is installed
+        run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+      - name: Make the samples
+        env:
+          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+          AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+        run: node scripts/voice-lab.mjs
+      - name: Publish them to the voice-lab branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q --orphan voice-lab
+          git rm -rq --cached . >/dev/null
+          git add lab
+          git commit -q -m "Voice lab samples"
+          git push -q -f origin voice-lab

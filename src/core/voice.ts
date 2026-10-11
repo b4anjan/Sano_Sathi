@@ -208,6 +208,17 @@ export function canSpeak(l: SpeechLang): boolean {
   return !!neV || (hindiFallback.value && !!hiV);
 }
 
+type How = 'clip' | 'tts' | 'partial' | 'silent';
+/**
+ * Quality check hook: when a test page sets window.__speechLog = [], every spoken part is
+ * recorded there with how it was heard (a clip, the device voice, part of the clips, or not
+ * at all). Costs nothing otherwise.
+ */
+function logPart(p: Part, how: How, missing: string[]): void {
+  const log = (globalThis as unknown as { __speechLog?: unknown[] }).__speechLog;
+  if (Array.isArray(log)) log.push({ text: p.text, lang: p.lang, how, missing, clips: p.clips ?? [] });
+}
+
 /**
  * Speak a sequence of parts, cancelling anything already playing.
  * Resolves true if anything was audible (so callers can add a chime when nothing was).
@@ -222,6 +233,8 @@ export async function say(parts: Part[]): Promise<boolean> {
     const urls = (p.clips ?? []).map(clipUrl);
     const { v, style } = voiceFor(p.lang);
     const canTts = !!synth && (p.lang === 'en' || !!v);
+    const missing = (p.clips ?? []).filter((_, i) => !urls[i]);
+    logPart(p, urls.length && !missing.length ? 'clip' : canTts ? 'tts' : urls.some(Boolean) ? 'partial' : 'silent', missing);
     if (urls.length && urls.every(Boolean)) {
       for (const u of urls) {
         if (my !== seq) return audible;
