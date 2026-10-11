@@ -5,14 +5,21 @@ import { say, stopSpeech, type Part } from '../../core/voice';
 import { award } from '../../core/rewards';
 import { SHAPES, COLORS, shapeSVG } from '../../content/shapes';
 import { PHRASES } from '../../content/strings';
+import { CHEERS, TRY_AGAIN, SORT_LINES, pickFresh, type Line } from '../../content/spoken';
 import { Bi, Stars, burst } from '../../ui/common';
 import { Buddy } from '../../ui/Buddy';
 
 /**
  * Shapes & Colors: sort felt shapes into baskets, by colour or by shape.
- * Drag a shape onto its basket, or tap the basket. A wrong basket just says what the
- * shape is and sends it back; there is nothing to lose.
+ * Drag a shape onto its basket, or tap the basket. Each new shape is named ("Red star.
+ * Where does it go?"). A right basket gets the word being learned and warm, varied praise
+ * ("Red! You did it!"); a wrong one gets the same word and a gentle "try again", and the
+ * shape comes back. There is nothing to lose.
  */
+/** Praise for a right basket: the general cheers, plus "That's the right basket!". */
+const SORT_CHEERS: Line[] = [...CHEERS, SORT_LINES.rightBasket];
+/** After a wrong basket. */
+const SORT_TRY: Line[] = [...TRY_AGAIN, SORT_LINES.otherBasket];
 const PER_ROUND = 8;
 type Rule = 'color' | 'shape';
 type ShapeId = (typeof SHAPES)[number]['id'];
@@ -56,6 +63,8 @@ export function Shapes() {
   /** True between a correct drop and the next piece (or round), so double taps don't count twice. */
   const busy = useRef(false);
   const timers = useRef<number[]>([]);
+  const lastCheer = useRef(-1);
+  const lastTry = useRef(-1);
   const l = lang.value;
 
   const later = (fn: () => void, ms: number) => timers.current.push(window.setTimeout(fn, ms));
@@ -71,6 +80,21 @@ export function Shapes() {
     ];
     return l === 'en' ? en : l === 'ne' ? ne : [...ne, ...en];
   };
+  /** The word this round is about (the colour, or the shape), then a short line: "Blue! Great job!" */
+  const wordThen = (p: Piece, line: Line): Part[] => {
+    const sh = SHAPES.find((x) => x.id === p.shape)!;
+    const word = (x: 'en' | 'ne'): Part =>
+      round.rule === 'color'
+        ? { text: `${p.color[x]}!`, lang: x, clips: [`${x}/${colorKey(p.color)}`] }
+        : { text: `${sh[x]}!`, lang: x, clips: [`${x}/${shapeKey(p.shape)}`] };
+    const one = (x: 'en' | 'ne'): Part[] => [word(x), { text: line[x], lang: x, clips: [`${x}/${line.key}`] }];
+    return l === 'en' ? one('en') : l === 'ne' ? one('ne') : [...one('ne'), ...one('en')];
+  };
+  const lineParts = (line: Line): Part[] => {
+    const one = (x: 'en' | 'ne'): Part => ({ text: line[x], lang: x, clips: [`${x}/${line.key}`] });
+    return l === 'en' ? [one('en')] : l === 'ne' ? [one('ne')] : [one('ne'), one('en')];
+  };
+  const whereGo = (p: Piece) => pieceParts(p, { ...PHRASES.whereGo, key: '_whereGo' });
 
   const newRound = (lv: Level) => {
     const r = makeRound(lv);
@@ -80,7 +104,7 @@ export function Shapes() {
     setSorted({});
     setCount(0);
     busy.current = false;
-    later(() => void say(pieceParts(p, { ...PHRASES.whereGo, key: '_whereGo' })), 400);
+    later(() => void say(whereGo(p)), 400);
   };
 
   useEffect(() => {
@@ -112,12 +136,13 @@ export function Shapes() {
         cheer();
         award(2);
         setStars((x) => x + 1);
-        void say(l === 'en' ? [{ text: 'All sorted! Well done!', lang: 'en', clips: ['en/_welldone'] }] : l === 'ne' ? [{ text: 'सबै मिल्यो! स्याबास!', lang: 'ne', clips: ['ne/_welldone'] }] : [{ text: 'सबै मिल्यो! स्याबास!', lang: 'ne', clips: ['ne/_welldone'] }, { text: 'All sorted! Well done!', lang: 'en', clips: ['en/_welldone'] }]);
-        later(() => newRound(level), 2400);
+        void say(lineParts(SORT_LINES.allSorted));
+        later(() => newRound(level), 2600);
         return;
       }
-      void say(pieceParts(piece));
       const p = makePiece(round.rule, round.bins);
+      // "Blue! You did it!" … then the next shape: "Red star. Where does it go?"
+      void say([...wordThen(piece, pickFresh(SORT_CHEERS, lastCheer)), ...whereGo(p)]);
       later(() => {
         setPiece(p);
         busy.current = false;
@@ -126,7 +151,8 @@ export function Shapes() {
       bloop(420, 300, 0.14);
       setBack(true);
       later(() => setBack(false), 450);
-      void say(pieceParts(piece, { ...PHRASES.otherBasket, key: '_otherBasket' }));
+      // "Blue! Try again!": the word to look for, and a kind nudge.
+      void say(wordThen(piece, pickFresh(SORT_TRY, lastTry)));
     }
   };
 
@@ -159,7 +185,7 @@ export function Shapes() {
     start.current = null;
     if (!s) return;
     if (!s.moved) {
-      void say(pieceParts(piece, { ...PHRASES.whereGo, key: '_whereGo' }));
+      void say(whereGo(piece));
       return;
     }
     const b = binAt(e.clientX, e.clientY);

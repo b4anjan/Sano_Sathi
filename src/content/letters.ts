@@ -52,6 +52,12 @@ export const NE_CONSONANT_ROWS: Letter[][] = [
 ];
 export const NE_CONSONANTS = NE_CONSONANT_ROWS.flat();
 
+/**
+ * Clip key for a letter said on its own ("ख", "B"), without the chant. A Nepali letter that
+ * has no word (ङ, ण…) is already said on its own by its letter- clip.
+ */
+export const letterOnlyKey = (L: Letter, l: 'en' | 'ne'): string => (l === 'ne' && !L.word ? `letter-${L.ch}` : `ln-${L.ch}`);
+
 /** The letter's word in the other language reuses a picture word's recording when it is the same word. */
 export function glossItem(L: Letter, l: 'en' | 'ne'): string | undefined {
   const it = L.art ? itemById(L.art) : undefined;

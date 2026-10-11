@@ -1,4 +1,4 @@
-import type { Bi } from './strings';
+import { PHRASES, S, type Bi } from './strings';
 import { EN_NUM, NE_NUM, NE_COUNTED, neDigits } from './numbers';
 import { itemById } from './items';
 
@@ -153,11 +153,55 @@ export const COUNT_LINES = {
   takeAway: (d: number): Bi => ({ en: `Let's take ${EN_NUM[d]} away.`, ne: `${NE_COUNTED[d]} झिकौँ।` }),
 };
 
+/* ------------------------------ Cheers ------------------------------ */
+/** A short line with its own recording. */
+export interface Line extends Bi {
+  key: string;
+}
+/**
+ * Praise after a right answer, varied so the buddy doesn't say the same thing every time.
+ * Said after the word being learned: "Blue! You did it!" / "नीलो! तिमीले सक्यौ!".
+ * Both languages use the same pick, so "both" mode says the same thing twice.
+ */
+export const CHEERS: Line[] = [
+  { key: '_welldone', ...PHRASES.welldone },
+  { key: 'cheer-great-job', en: 'Great job!', ne: 'धेरै राम्रो!' },
+  { key: 'cheer-did-it', en: 'You did it!', ne: 'तिमीले सक्यौ!' },
+  { key: 'cheer-great-work', en: 'Great work!', ne: 'गज्जब!' },
+  { key: 'cheer-right', en: "Yes, that's right!", ne: 'हो, ठीक हो!' },
+  { key: 'cheer-perfect', en: 'Perfect!', ne: 'एकदम ठीक!' },
+  { key: 'cheer-wow', en: 'Wow, so good!', ne: 'वाह, कति राम्रो!' },
+];
+/** Gentle words after a miss: never "wrong", always "try again". */
+export const TRY_AGAIN: Line[] = [
+  { key: 's-tryAgain', ...S.tryAgain },
+  { key: 'try-again', en: 'Try again!', ne: 'फेरि कोसिस गर!' },
+  { key: 'try-can-do', en: 'You can do it!', ne: 'तिमी सक्छौ!' },
+];
+/** Shapes & Colors' own lines. */
+export const SORT_LINES = {
+  rightBasket: { key: 'cheer-basket', en: "That's the right basket!", ne: 'ठीक डालोमा राख्यौ!' },
+  otherBasket: { key: '_otherBasket', ...PHRASES.otherBasket },
+  allSorted: { key: 'sort-all-done', en: 'You sorted them all! Great job!', ne: 'सबै मिलायौ! स्याबास!' },
+} satisfies Record<string, Line>;
+
+/** Pick one, but not the one picked last time (pass a ref-like holder). */
+export function pickFresh<T>(xs: readonly T[], last: { current: number }): T {
+  let k = Math.floor(Math.random() * xs.length);
+  if (xs.length > 1 && k === last.current) k = (k + 1 + Math.floor(Math.random() * (xs.length - 1))) % xs.length;
+  last.current = k;
+  return xs[k];
+}
+
+/** Lines that already come from another list of the script (strings.ts) are not repeated. */
+const OWN_LINES = (): Line[] => [...CHEERS, ...TRY_AGAIN, ...Object.values(SORT_LINES)].filter((x) => !x.key.startsWith('_') && !x.key.startsWith('s-'));
+
 /** All pieces for the voice script, per language: [key, text, where used]. */
 export function spokenLines(l: 'en' | 'ne'): Array<[string, string, string]> {
   const out: Array<[string, string, string]> = [];
   for (const [k, t] of Object.entries(FRAG)) if (t[l]) out.push([k, t[l], k.startsWith('mq-') ? 'Math Quest: joined with numbers' : 'Rupee Shop: joined with numbers and goods']);
   for (const id of GOODS) out.push([`shop-costs-${id}`, costsLine(id)[l], 'Rupee Shop: said before the price']);
+  for (const x of OWN_LINES()) out.push([x.key, x[l], x.key.startsWith('try') ? 'Encouragement after a miss' : 'Praise after a right answer']);
   for (let f = 0; f <= 10; f++) out.push([`mq-done-${f}`, mathDoneLine(f)[l], 'Math Quest: end of a round']);
   for (let n = 1; n <= 10; n++) {
     out.push([`yum-${n}`, COUNT_LINES.yum(n)[l], 'Counting: the buddy got the right number']);

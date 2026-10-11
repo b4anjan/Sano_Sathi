@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { scriptFor } from './script';
 import { ITEMS } from './items';
-import { EN_LETTERS, NE_CONSONANTS, NE_VOWELS, glossItem } from './letters';
+import { EN_LETTERS, NE_CONSONANTS, NE_VOWELS, glossItem, letterOnlyKey } from './letters';
+import { CHEERS, SORT_LINES, TRY_AGAIN, pickFresh } from './spoken';
+import { COLORS, SHAPES } from './shapes';
 import { GOODS, answerSaid, mathSaid, shopAlmostSaid, shopAskSaid, shopChangeIsSaid, shopChangeSaid, shopThanksSaid, type Said } from './spoken';
 import { makeProblem, type Op } from '../modes/math/gen';
 
@@ -50,6 +52,41 @@ describe('sentences joined from recorded pieces', () => {
     for (let n = 0; n <= 100; n++) {
       expect(keys.en.has(`num${n}`)).toBe(true);
       expect(keys.ne.has(`num${n}`)).toBe(true);
+    }
+  });
+});
+
+describe('praise, encouragement and letters on their own', () => {
+  it('every cheer and try-again line is recorded in both languages, with distinct keys', () => {
+    const all = [...CHEERS, ...TRY_AGAIN, ...Object.values(SORT_LINES)];
+    expect(new Set(all.map((x) => x.key)).size).toBe(all.length);
+    for (const x of all) {
+      expect(keys.en.has(x.key), `en/${x.key}`).toBe(true);
+      expect(keys.ne.has(x.key), `ne/${x.key}`).toBe(true);
+    }
+  });
+
+  it('Shapes & Colors can say every colour and shape before its praise', () => {
+    for (const c of COLORS) for (const l of ['en', 'ne'] as const) expect(keys[l].has(`color-${c.en.replace(/\s+/g, '-')}`)).toBe(true);
+    for (const sh of SHAPES) for (const l of ['en', 'ne'] as const) expect(keys[l].has(`shape-${sh.id}`)).toBe(true);
+  });
+
+  it('never picks the same line twice in a row', () => {
+    const last = { current: -1 };
+    let prev = '';
+    for (let i = 0; i < 200; i++) {
+      const x = pickFresh(CHEERS, last).key;
+      expect(x).not.toBe(prev);
+      prev = x;
+    }
+  });
+
+  it('every letter has a recording of just the letter (Bubble Pop)', () => {
+    for (const L of EN_LETTERS) expect(keys.en.has(letterOnlyKey(L, 'en')), L.ch).toBe(true);
+    for (const L of [...NE_VOWELS, ...NE_CONSONANTS]) {
+      expect(keys.ne.has(letterOnlyKey(L, 'ne')), L.ch).toBe(true);
+      const line = scriptFor('ne').find((x) => x.key === letterOnlyKey(L, 'ne'))!;
+      expect(line.text, 'no chant, just the letter').toBe(L.ch);
     }
   });
 });

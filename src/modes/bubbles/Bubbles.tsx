@@ -3,7 +3,7 @@ import { lang } from '../../core/settings';
 import { unlockAudio, cheer, sfx, mallet, PENTA } from '../../core/audio';
 import { say, stopSpeech, type Part } from '../../core/voice';
 import { award } from '../../core/rewards';
-import { EN_LETTERS, NE_CONSONANTS } from '../../content/letters';
+import { EN_LETTERS, NE_CONSONANTS, letterOnlyKey } from '../../content/letters';
 import { EN_NUM, NE_NUM, neDigits } from '../../content/numbers';
 import { COLORS } from '../../content/shapes';
 import { Bi } from '../../ui/common';
@@ -29,8 +29,9 @@ interface Thing {
 
 function things(mode: Mode, l: string): Thing[] {
   const one = (p: Part) => () => [p];
-  const abc = EN_LETTERS.map((L) => ({ key: `en-${L.ch}`, label: L.ch, parts: one({ text: L.say, lang: 'en', clips: [`en/ln-${L.ch}`] }) }));
-  const kakha = NE_CONSONANTS.slice(0, 25).map((L) => ({ key: `ne-${L.ch}`, label: L.ch, parts: one({ text: L.ch, lang: 'ne', clips: [`ne/letter-${L.ch}`] }) }));
+  const abc = EN_LETTERS.map((L) => ({ key: `en-${L.ch}`, label: L.ch, parts: one({ text: L.say, lang: 'en', clips: [`en/${letterOnlyKey(L, 'en')}`] }) }));
+  // Just the letter, like the ABC bubbles (the chant "ख, खेतको ख" is for the Letters screen).
+  const kakha = NE_CONSONANTS.slice(0, 25).map((L) => ({ key: `ne-${L.ch}`, label: L.ch, parts: one({ text: L.ch, lang: 'ne', clips: [`ne/${letterOnlyKey(L, 'ne')}`] }) }));
   const num = Array.from({ length: 10 }, (_, i) => i + 1).map((n) => ({
     key: `n-${n}`,
     label: l === 'ne' ? neDigits(n) : String(n),

@@ -12,8 +12,10 @@
  * are new or changed (--force remakes everything) and removes clips for lines that are gone.
  *
  * The free (F0) tier allows 20 requests a minute, so requests are spaced about 3 s apart.
- * Each clip is then trimmed (Azure leaves up to a second of silence after a word) and
- * levelled with ffmpeg, so all clips start promptly and play at the same loudness.
+ * Azure sends uncompressed audio; ffmpeg trims the silence (Azure leaves up to a second after
+ * a word), sets one steady volume for the whole clip (no pumping), and encodes the MP3 once.
+ * HD voices now and then ramble on a short line, so a clip much longer than its text should
+ * take is made again (up to 3 tries, keeping the shortest).
  */
 import { build } from 'esbuild';
 import { createHash } from 'node:crypto';
@@ -22,7 +24,8 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, w
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { buildSsml, VOICE_VERSION } from './voice-ssml.mjs';
+import { buildSsml, maxSeconds, VOICE_VERSION } from './voice-ssml.mjs';
+import { tidySpeech } from './voice-tidy.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const outRoot = join(root, 'src/audio/ai');
@@ -39,19 +42,36 @@ const SAFE = /^[^\\/:*?"<>|\s]+$/;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const hasFfmpeg = spawnSync('ffmpeg', ['-version'], { stdio: 'ignore' }).status === 0;
-const TRIM =
-  'silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.03,areverse,' +
-  'silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.12,areverse,' +
-  'loudnorm=I=-16:TP=-1.5:LRA=11';
+const RATE = 24000;
+const PCM_IN = ['-f', 's16le', '-ar', String(RATE), '-ac', '1'];
+/** Without ffmpeg, ask Azure for MP3 directly (no trimming or levelling). */
+const FORMAT = hasFfmpeg ? 'riff-24khz-16bit-mono-pcm' : 'audio-24khz-48kbitrate-mono-mp3';
 
-/** Trim silence and level loudness; returns the original audio if ffmpeg is missing or fails. */
-function polish(mp3, tmp) {
-  if (!hasFfmpeg) return mp3;
-  const src = join(tmp, 'in.mp3');
+/**
+ * Trim the silence and tidy the speech (voice-tidy.mjs: drops a stray sound after a lone
+ * letter, shortens over-long pauses), set one steady volume (average about -18 dB, peaks
+ * below -1 dB), and encode the MP3 once. Returns the MP3 and its length in seconds.
+ */
+function polish(raw, tmp, text) {
+  if (!hasFfmpeg) return { mp3: raw, secs: null };
+  const src = join(tmp, 'in.wav');
+  const tidy = join(tmp, 'tidy.pcm');
   const dst = join(tmp, 'out.mp3');
-  writeFileSync(src, mp3);
-  const r = spawnSync('ffmpeg', ['-loglevel', 'error', '-y', '-i', src, '-af', TRIM, '-ar', '24000', '-ac', '1', '-c:a', 'libmp3lame', '-b:a', '48k', dst]);
-  return r.status === 0 && existsSync(dst) ? readFileSync(dst) : mp3;
+  writeFileSync(src, raw);
+  for (const f of [tidy, dst]) rmSync(f, { force: true });
+  const dec = spawnSync('ffmpeg', ['-loglevel', 'error', '-i', src, ...PCM_IN, '-'], { maxBuffer: 1 << 27 });
+  if (dec.status !== 0 || !dec.stdout?.length) throw Object.assign(new Error('ffmpeg could not read the audio'), { skip: true });
+  const bytes = new Uint8Array(dec.stdout.length & ~1);
+  bytes.set(dec.stdout.subarray(0, bytes.length));
+  const pcm = tidySpeech(new Int16Array(bytes.buffer), RATE, text);
+  writeFileSync(tidy, Buffer.from(pcm.buffer, pcm.byteOffset, pcm.byteLength));
+  const probe = spawnSync('ffmpeg', ['-hide_banner', ...PCM_IN, '-i', tidy, '-af', 'volumedetect', '-f', 'null', '-'], { encoding: 'utf8' }).stderr;
+  const mean = Number(/mean_volume: (-?[\d.]+) dB/.exec(probe)?.[1] ?? -20);
+  const peak = Number(/max_volume: (-?[\d.]+) dB/.exec(probe)?.[1] ?? -1);
+  const gain = Math.min(-18 - mean, -1 - peak);
+  const e = spawnSync('ffmpeg', ['-loglevel', 'error', '-y', ...PCM_IN, '-i', tidy, '-af', `volume=${gain.toFixed(2)}dB`, '-c:a', 'libmp3lame', '-b:a', '64k', dst]);
+  if (e.status !== 0 || !existsSync(dst)) throw Object.assign(new Error('ffmpeg could not encode the clip'), { skip: true });
+  return { mp3: readFileSync(dst), secs: pcm.length / RATE };
 }
 const hashOf = (s) => createHash('sha1').update(`${VOICE_VERSION}|${s}`).digest('hex').slice(0, 12);
 
@@ -74,7 +94,7 @@ async function synth(ssml, key, region) {
         headers: {
           'Ocp-Apim-Subscription-Key': key,
           'Content-Type': 'application/ssml+xml',
-          'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3',
+          'X-Microsoft-OutputFormat': FORMAT,
           'User-Agent': 'sano-sathi-voices',
         },
         body: ssml,
@@ -137,24 +157,39 @@ const save = () => {
 
 let made = 0;
 const skipped = [];
+const long = [];
 let last = 0;
+/** One request, spaced to stay inside the free tier's limit. */
+async function makeOnce(p) {
+  const wait = last + GAP_MS - Date.now();
+  if (wait > 0) await sleep(wait);
+  last = Date.now();
+  const raw = await synth(p.ssml, key, region);
+  if (raw.length < 500) throw Object.assign(new Error('audio too short'), { skip: true });
+  return polish(raw, work, p.j.text);
+}
+const TRIES = 3;
 for (const p of todo) {
   if (!SAFE.test(p.j.key)) {
     skipped.push(`${p.id} (unsafe file name)`);
     continue;
   }
-  const wait = last + GAP_MS - Date.now();
-  if (wait > 0) await sleep(wait);
-  last = Date.now();
   try {
-    const raw = await synth(p.ssml, key, region);
-    if (raw.length < 500) throw Object.assign(new Error('audio too short'), { skip: true });
-    const mp3 = polish(raw, work);
+    // Remake a clip that runs much longer than its text should take; keep the shortest.
+    const limitSecs = maxSeconds(p.j.text);
+    let best = await makeOnce(p);
+    for (let t = 2; t <= TRIES && best.secs !== null && best.secs > limitSecs; t++) {
+      console.log(`  … ${p.id} took ${best.secs.toFixed(2)} s (expected under ${limitSecs.toFixed(1)} s), making it again`);
+      const again = await makeOnce(p);
+      if (again.secs !== null && again.secs < best.secs) best = again;
+    }
+    if (best.secs !== null && best.secs > limitSecs) long.push(`${p.id}  ${p.j.text}  ${best.secs.toFixed(2)} s`);
+    const mp3 = best.mp3;
     mkdirSync(dirname(fileOf(p.id)), { recursive: true });
     writeFileSync(fileOf(p.id), mp3);
     manifest[p.id] = p.hash;
     made++;
-    console.log(`  ✓ ${p.id}  ${p.j.text}  (${(mp3.length / 1024).toFixed(1)} KB)`);
+    console.log(`  ✓ ${p.id}  ${p.j.text}  (${best.secs !== null ? `${best.secs.toFixed(2)} s, ` : ''}${(mp3.length / 1024).toFixed(1)} KB)`);
     if (made % 10 === 0) save();
   } catch (e) {
     if (!e.skip) {
@@ -183,3 +218,7 @@ save();
 rmSync(work, { recursive: true, force: true });
 console.log(`Made ${made} clips${removed ? `, removed ${removed}` : ''}${skipped.length ? `, skipped ${skipped.length}` : ''}.`);
 for (const s of skipped) console.log(`  skipped ${s}`);
+if (long.length) {
+  console.log(`Still long after ${TRIES} tries (kept the shortest; worth a listen):`);
+  for (const s of long) console.log(`  ${s}`);
+}

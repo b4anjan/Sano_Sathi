@@ -153,6 +153,10 @@ export function scriptFor(l: RecLang): Line[] {
   }
 
   if (l === 'ne') {
+    // Just the letter, for Bubble Pop ("ख", not "ख, खेतको ख"); letters with no word already are.
+    for (const L of [...NE_VOWELS, ...NE_CONSONANTS]) {
+      if (L.word) out.push({ key: `ln-${L.ch}`, group: 'letters', text: L.ch, hint: 'Bubble Pop: just the letter', art: L.art });
+    }
     for (const L of [...NE_VOWELS, ...NE_CONSONANTS]) {
       out.push({
         key: `letter-${L.ch}`,
