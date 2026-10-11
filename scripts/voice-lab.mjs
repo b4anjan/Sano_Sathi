@@ -97,11 +97,37 @@ if (process.env.LAB_ROUND === 'letters') {
     { id: 'H-ava', desc: 'Ava HD (female)', ne: 'en-US-Ava:DragonHDLatestNeural', en: 'en-US-Ava:DragonHDLatestNeural', pitch: 0, slow: 0, hq: true, multi: true },
   );
 }
+// Round "female": the I4 recipe (HD voice as it is; letter lines 10% slower) on female voices
+// for Cat and Puppy, with Andrew (Panda) for reference. Both languages.
+if (process.env.LAB_ROUND === 'female') {
+  LINES.splice(0, LINES.length,
+    { id: '1-ka', lang: 'ne', letters: true, parts: [L('क', 'kʌ'), ', कुखुराको ', L('क', 'kʌ')] },
+    { id: '2-kha', lang: 'ne', letters: true, parts: [L('ख', 'kʰʌ')] },
+    { id: '3-nga', lang: 'ne', letters: true, parts: [L('ङ', 'ŋʌ')] },
+    { id: '4-cat', lang: 'ne', text: 'म्याउँ! म बिरालो। आऊ, खेलौँ!' },
+    { id: '5-puppy', lang: 'ne', text: 'भुक् भुक्! म कुकुर। आऊ, खेलौँ!' },
+    { id: '6-praise', lang: 'ne', text: 'नीलो! स्याबास! ठीक डालोमा राख्यौ!' },
+    { id: '7-word', lang: 'ne', text: 'पहेँलो' },
+    { id: '8-sentence', lang: 'ne', text: 'राति भयो। चाँडै सुत्ने बेला भयो!' },
+    { id: '9-en-hello', lang: 'en', text: "Meow! I'm Cat. Come on, let's play!" },
+    { id: '10-en-praise', lang: 'en', text: "Blue! Great job! That's the right basket!" },
+  );
+  const hd = (name) => `${name}:DragonHDLatestNeural`;
+  const i4 = (id, desc, voice) => ({ id, desc, ne: hd(voice), en: hd(voice), pitch: 0, slow: 0, letterRate: -10, hq: true, multi: true });
+  VARIANTS.splice(0, VARIANTS.length,
+    i4('I4-andrew', 'Andrew HD, the I4 recipe (Panda)', 'en-US-Andrew'),
+    i4('W1-ava', 'Ava HD, I4 recipe', 'en-US-Ava'),
+    i4('W2-emma', 'Emma HD, I4 recipe', 'en-US-Emma'),
+    i4('W3-jenny', 'Jenny HD, I4 recipe', 'en-US-Jenny'),
+    i4('W4-neerja', 'Neerja HD, I4 recipe', 'en-IN-Neerja'),
+    i4('W5-aarti', 'Aarti HD, I4 recipe', 'en-IN-Aarti'),
+  );
+}
 for (const line of LINES) if (line.parts) line.text = line.parts.map((p) => (typeof p === 'string' ? p : p.L)).join('');
 
 // Multilingual voices to try: LAB_VOICES (comma list) or, by default, the first three.
-const wanted = process.env.LAB_ROUND === 'letters' ? [] : (process.env.LAB_VOICES || '').split(',').map((s) => s.trim()).filter(Boolean);
-const pickList = process.env.LAB_ROUND === 'letters' ? [] : wanted.length ? nepali.filter((x) => wanted.includes(x.name)) : nepali.filter((x) => !x.locale.startsWith('ne')).slice(0, 3);
+const wanted = process.env.LAB_ROUND ? [] : (process.env.LAB_VOICES || '').split(',').map((s) => s.trim()).filter(Boolean);
+const pickList = process.env.LAB_ROUND ? [] : wanted.length ? nepali.filter((x) => wanted.includes(x.name)) : nepali.filter((x) => !x.locale.startsWith('ne')).slice(0, 3);
 if (wanted.length) {
   // A focused round: keep only today's voice and the clean native voices for reference.
   VARIANTS.splice(0, VARIANTS.length, ...VARIANTS.filter((v) => ['A-now-cat', 'B-hemkala-clean', 'D-sagar-clean'].includes(v.id)));

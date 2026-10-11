@@ -11,7 +11,7 @@ on:
         type: string
         default: ''
       round:
-        description: Which test (empty = voices; "letters" = single Nepali letters and chants)
+        description: Which test (empty = voices; "letters" = single Nepali letters; "female" = female voices with the I4 recipe)
         type: string
         default: ''
 
