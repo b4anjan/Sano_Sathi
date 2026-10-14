@@ -1,0 +1,506 @@
+{
+ "engine": "light",
+ "variants": [
+  {
+   "id": "K1-kala",
+   "desc": "kala-tts, speaker kala",
+   "licence": "MIT code, CC BY-SA 4.0 voice"
+  },
+  {
+   "id": "K2-kala-slower",
+   "desc": "kala-tts, speaker kala, 15% slower",
+   "licence": "MIT code, CC BY-SA 4.0 voice"
+  },
+  {
+   "id": "K3-barsha",
+   "desc": "kala-tts, speaker barsha",
+   "licence": "MIT code, CC BY-SA 4.0 voice"
+  },
+  {
+   "id": "P1-piper-0",
+   "desc": "Piper Nepali (Google recordings), speaker 0",
+   "licence": "CC BY-SA 4.0 voice"
+  },
+  {
+   "id": "P2-piper-5",
+   "desc": "Piper Nepali (Google recordings), speaker 5",
+   "licence": "CC BY-SA 4.0 voice"
+  },
+  {
+   "id": "P3-chitwan",
+   "desc": "Piper Nepali, chitwan (male)",
+   "licence": "CC0 recordings"
+  }
+ ],
+ "report": [
+  {
+   "variant": "K1-kala",
+   "line": "01-ka",
+   "ok": true,
+   "secs": 0.12
+  },
+  {
+   "variant": "K1-kala",
+   "line": "02-kha",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K1-kala",
+   "line": "03-ka-chant",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "K1-kala",
+   "line": "04-kha-chant",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "K1-kala",
+   "line": "05-jha-chant",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "K1-kala",
+   "line": "06-nga",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K1-kala",
+   "line": "07-ksha",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K1-kala",
+   "line": "08-a-chant",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "K1-kala",
+   "line": "09-number",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K1-kala",
+   "line": "10-word",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K1-kala",
+   "line": "11-cat",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "K1-kala",
+   "line": "12-praise",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "K1-kala",
+   "line": "13-sentence",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "01-ka",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "02-kha",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "03-ka-chant",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "04-kha-chant",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "05-jha-chant",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "06-nga",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "07-ksha",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "08-a-chant",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "09-number",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "10-word",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "11-cat",
+   "ok": true,
+   "secs": 0.04
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "12-praise",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "13-sentence",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "01-ka",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "02-kha",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "03-ka-chant",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "04-kha-chant",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "05-jha-chant",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "06-nga",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "07-ksha",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "08-a-chant",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "09-number",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "10-word",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "11-cat",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "12-praise",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "13-sentence",
+   "ok": true,
+   "secs": 0.04
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "01-ka",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "02-kha",
+   "ok": true,
+   "secs": 0.04
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "03-ka-chant",
+   "ok": true,
+   "secs": 0.05
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "04-kha-chant",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "05-jha-chant",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "06-nga",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "07-ksha",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "08-a-chant",
+   "ok": true,
+   "secs": 0.04
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "09-number",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "10-word",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "11-cat",
+   "ok": true,
+   "secs": 0.07
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "12-praise",
+   "ok": true,
+   "secs": 0.07
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "13-sentence",
+   "ok": true,
+   "secs": 0.06
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "01-ka",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "02-kha",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "03-ka-chant",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "04-kha-chant",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "05-jha-chant",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "06-nga",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "07-ksha",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "08-a-chant",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "09-number",
+   "ok": true,
+   "secs": 0.01
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "10-word",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "11-cat",
+   "ok": true,
+   "secs": 0.06
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "12-praise",
+   "ok": true,
+   "secs": 0.06
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "13-sentence",
+   "ok": true,
+   "secs": 0.06
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "01-ka",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "02-kha",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "03-ka-chant",
+   "ok": true,
+   "secs": 0.04
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "04-kha-chant",
+   "ok": true,
+   "secs": 0.04
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "05-jha-chant",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "06-nga",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "07-ksha",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "08-a-chant",
+   "ok": true,
+   "secs": 0.03
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "09-number",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "10-word",
+   "ok": true,
+   "secs": 0.02
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "11-cat",
+   "ok": true,
+   "secs": 0.08
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "12-praise",
+   "ok": true,
+   "secs": 0.08
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "13-sentence",
+   "ok": true,
+   "secs": 0.06
+  }
+ ],
+ "load_errors": []
+}

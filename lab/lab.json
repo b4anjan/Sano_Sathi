@@ -1,0 +1,1193 @@
+{
+ "round": "open-source",
+ "lines": {
+  "01-ka": "क",
+  "02-kha": "ख",
+  "03-ka-chant": "क, कुखुराको क",
+  "04-kha-chant": "ख, खेतको ख",
+  "05-jha-chant": "झ, झण्डाको झ",
+  "06-nga": "ङ",
+  "07-ksha": "क्ष",
+  "08-a-chant": "अ, अनारको अ",
+  "09-number": "सात",
+  "10-word": "पहेँलो",
+  "11-cat": "म्याउँ! म बिरालो। आऊ, खेलौँ!",
+  "12-praise": "नीलो! स्याबास! ठीक डालोमा राख्यौ!",
+  "13-sentence": "राति भयो। चाँडै सुत्ने बेला भयो!"
+ },
+ "engines": [
+  {
+   "engine": "chatterbox",
+   "variants": [
+    {
+     "id": "N1-chatterbox",
+     "desc": "Chatterbox, Nepali fine-tune, voice copied from kala-tts",
+     "licence": "MIT"
+    }
+   ],
+   "report": [
+    {
+     "variant": "N1-chatterbox",
+     "line": "01-ka",
+     "ok": false,
+     "error": "IndexError: max(): Expected reduction dim 1 to have non-zero size."
+    },
+    {
+     "variant": "N1-chatterbox",
+     "line": "02-kha",
+     "ok": false,
+     "error": "IndexError: max(): Expected reduction dim 1 to have non-zero size."
+    },
+    {
+     "variant": "N1-chatterbox",
+     "line": "03-ka-chant",
+     "ok": false,
+     "error": "IndexError: index out of range in self"
+    },
+    {
+     "variant": "N1-chatterbox",
+     "line": "04-kha-chant",
+     "ok": false,
+     "error": "IndexError: index out of range in self"
+    },
+    {
+     "variant": "N1-chatterbox",
+     "line": "05-jha-chant",
+     "ok": false,
+     "error": "IndexError: index out of range in self"
+    },
+    {
+     "variant": "N1-chatterbox",
+     "line": "06-nga",
+     "ok": false,
+     "error": "IndexError: max(): Expected reduction dim 1 to have non-zero size."
+    },
+    {
+     "variant": "N1-chatterbox",
+     "line": "07-ksha",
+     "ok": false,
+     "error": "IndexError: index out of range in self"
+    },
+    {
+     "variant": "N1-chatterbox",
+     "line": "08-a-chant",
+     "ok": true,
+     "secs": 27.9
+    },
+    {
+     "variant": "N1-chatterbox",
+     "line": "09-number",
+     "ok": true,
+     "secs": 10.27
+    },
+    {
+     "variant": "N1-chatterbox",
+     "line": "10-word",
+     "ok": true,
+     "secs": 7.53
+    },
+    {
+     "variant": "N1-chatterbox",
+     "line": "11-cat",
+     "ok": true,
+     "secs": 16.99
+    },
+    {
+     "variant": "N1-chatterbox",
+     "line": "12-praise",
+     "ok": false,
+     "error": "IndexError: index out of range in self"
+    },
+    {
+     "variant": "N1-chatterbox",
+     "line": "13-sentence",
+     "ok": false,
+     "error": "IndexError: index out of range in self"
+    }
+   ],
+   "load_errors": []
+  },
+  {
+   "engine": "light",
+   "variants": [
+    {
+     "id": "K1-kala",
+     "desc": "kala-tts, speaker kala",
+     "licence": "MIT code, CC BY-SA 4.0 voice"
+    },
+    {
+     "id": "K2-kala-slower",
+     "desc": "kala-tts, speaker kala, 15% slower",
+     "licence": "MIT code, CC BY-SA 4.0 voice"
+    },
+    {
+     "id": "K3-barsha",
+     "desc": "kala-tts, speaker barsha",
+     "licence": "MIT code, CC BY-SA 4.0 voice"
+    },
+    {
+     "id": "P1-piper-0",
+     "desc": "Piper Nepali (Google recordings), speaker 0",
+     "licence": "CC BY-SA 4.0 voice"
+    },
+    {
+     "id": "P2-piper-5",
+     "desc": "Piper Nepali (Google recordings), speaker 5",
+     "licence": "CC BY-SA 4.0 voice"
+    },
+    {
+     "id": "P3-chitwan",
+     "desc": "Piper Nepali, chitwan (male)",
+     "licence": "CC0 recordings"
+    }
+   ],
+   "report": [
+    {
+     "variant": "K1-kala",
+     "line": "01-ka",
+     "ok": true,
+     "secs": 0.12
+    },
+    {
+     "variant": "K1-kala",
+     "line": "02-kha",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K1-kala",
+     "line": "03-ka-chant",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "K1-kala",
+     "line": "04-kha-chant",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "K1-kala",
+     "line": "05-jha-chant",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "K1-kala",
+     "line": "06-nga",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K1-kala",
+     "line": "07-ksha",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K1-kala",
+     "line": "08-a-chant",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "K1-kala",
+     "line": "09-number",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K1-kala",
+     "line": "10-word",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K1-kala",
+     "line": "11-cat",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "K1-kala",
+     "line": "12-praise",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "K1-kala",
+     "line": "13-sentence",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "K2-kala-slower",
+     "line": "01-ka",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K2-kala-slower",
+     "line": "02-kha",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K2-kala-slower",
+     "line": "03-ka-chant",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "K2-kala-slower",
+     "line": "04-kha-chant",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "K2-kala-slower",
+     "line": "05-jha-chant",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "K2-kala-slower",
+     "line": "06-nga",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K2-kala-slower",
+     "line": "07-ksha",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K2-kala-slower",
+     "line": "08-a-chant",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "K2-kala-slower",
+     "line": "09-number",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K2-kala-slower",
+     "line": "10-word",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K2-kala-slower",
+     "line": "11-cat",
+     "ok": true,
+     "secs": 0.04
+    },
+    {
+     "variant": "K2-kala-slower",
+     "line": "12-praise",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "K2-kala-slower",
+     "line": "13-sentence",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "K3-barsha",
+     "line": "01-ka",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K3-barsha",
+     "line": "02-kha",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K3-barsha",
+     "line": "03-ka-chant",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "K3-barsha",
+     "line": "04-kha-chant",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "K3-barsha",
+     "line": "05-jha-chant",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "K3-barsha",
+     "line": "06-nga",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K3-barsha",
+     "line": "07-ksha",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K3-barsha",
+     "line": "08-a-chant",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "K3-barsha",
+     "line": "09-number",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K3-barsha",
+     "line": "10-word",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "K3-barsha",
+     "line": "11-cat",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "K3-barsha",
+     "line": "12-praise",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "K3-barsha",
+     "line": "13-sentence",
+     "ok": true,
+     "secs": 0.04
+    },
+    {
+     "variant": "P1-piper-0",
+     "line": "01-ka",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "P1-piper-0",
+     "line": "02-kha",
+     "ok": true,
+     "secs": 0.04
+    },
+    {
+     "variant": "P1-piper-0",
+     "line": "03-ka-chant",
+     "ok": true,
+     "secs": 0.05
+    },
+    {
+     "variant": "P1-piper-0",
+     "line": "04-kha-chant",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "P1-piper-0",
+     "line": "05-jha-chant",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "P1-piper-0",
+     "line": "06-nga",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "P1-piper-0",
+     "line": "07-ksha",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "P1-piper-0",
+     "line": "08-a-chant",
+     "ok": true,
+     "secs": 0.04
+    },
+    {
+     "variant": "P1-piper-0",
+     "line": "09-number",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "P1-piper-0",
+     "line": "10-word",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "P1-piper-0",
+     "line": "11-cat",
+     "ok": true,
+     "secs": 0.07
+    },
+    {
+     "variant": "P1-piper-0",
+     "line": "12-praise",
+     "ok": true,
+     "secs": 0.07
+    },
+    {
+     "variant": "P1-piper-0",
+     "line": "13-sentence",
+     "ok": true,
+     "secs": 0.06
+    },
+    {
+     "variant": "P2-piper-5",
+     "line": "01-ka",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "P2-piper-5",
+     "line": "02-kha",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "P2-piper-5",
+     "line": "03-ka-chant",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "P2-piper-5",
+     "line": "04-kha-chant",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "P2-piper-5",
+     "line": "05-jha-chant",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "P2-piper-5",
+     "line": "06-nga",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "P2-piper-5",
+     "line": "07-ksha",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "P2-piper-5",
+     "line": "08-a-chant",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "P2-piper-5",
+     "line": "09-number",
+     "ok": true,
+     "secs": 0.01
+    },
+    {
+     "variant": "P2-piper-5",
+     "line": "10-word",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "P2-piper-5",
+     "line": "11-cat",
+     "ok": true,
+     "secs": 0.06
+    },
+    {
+     "variant": "P2-piper-5",
+     "line": "12-praise",
+     "ok": true,
+     "secs": 0.06
+    },
+    {
+     "variant": "P2-piper-5",
+     "line": "13-sentence",
+     "ok": true,
+     "secs": 0.06
+    },
+    {
+     "variant": "P3-chitwan",
+     "line": "01-ka",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "P3-chitwan",
+     "line": "02-kha",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "P3-chitwan",
+     "line": "03-ka-chant",
+     "ok": true,
+     "secs": 0.04
+    },
+    {
+     "variant": "P3-chitwan",
+     "line": "04-kha-chant",
+     "ok": true,
+     "secs": 0.04
+    },
+    {
+     "variant": "P3-chitwan",
+     "line": "05-jha-chant",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "P3-chitwan",
+     "line": "06-nga",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "P3-chitwan",
+     "line": "07-ksha",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "P3-chitwan",
+     "line": "08-a-chant",
+     "ok": true,
+     "secs": 0.03
+    },
+    {
+     "variant": "P3-chitwan",
+     "line": "09-number",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "P3-chitwan",
+     "line": "10-word",
+     "ok": true,
+     "secs": 0.02
+    },
+    {
+     "variant": "P3-chitwan",
+     "line": "11-cat",
+     "ok": true,
+     "secs": 0.08
+    },
+    {
+     "variant": "P3-chitwan",
+     "line": "12-praise",
+     "ok": true,
+     "secs": 0.08
+    },
+    {
+     "variant": "P3-chitwan",
+     "line": "13-sentence",
+     "ok": true,
+     "secs": 0.06
+    }
+   ],
+   "load_errors": []
+  }
+ ],
+ "measured": [
+  {
+   "variant": "K1-kala",
+   "line": "01-ka",
+   "before": 0.37,
+   "after": 0.17,
+   "long": false
+  },
+  {
+   "variant": "K1-kala",
+   "line": "02-kha",
+   "before": 0.45,
+   "after": 0.23,
+   "long": false
+  },
+  {
+   "variant": "K1-kala",
+   "line": "03-ka-chant",
+   "before": 1.47,
+   "after": 0.95,
+   "long": false
+  },
+  {
+   "variant": "K1-kala",
+   "line": "04-kha-chant",
+   "before": 1.38,
+   "after": 1.25,
+   "long": false
+  },
+  {
+   "variant": "K1-kala",
+   "line": "05-jha-chant",
+   "before": 1.54,
+   "after": 1.35,
+   "long": false
+  },
+  {
+   "variant": "K1-kala",
+   "line": "06-nga",
+   "before": 0.39,
+   "after": 0.21,
+   "long": false
+  },
+  {
+   "variant": "K1-kala",
+   "line": "07-ksha",
+   "before": 0.37,
+   "after": 0.24,
+   "long": false
+  },
+  {
+   "variant": "K1-kala",
+   "line": "08-a-chant",
+   "before": 1.26,
+   "after": 0.71,
+   "long": false
+  },
+  {
+   "variant": "K1-kala",
+   "line": "09-number",
+   "before": 0.48,
+   "after": 0.27,
+   "long": false
+  },
+  {
+   "variant": "K1-kala",
+   "line": "10-word",
+   "before": 0.62,
+   "after": 0.53,
+   "long": false
+  },
+  {
+   "variant": "K1-kala",
+   "line": "11-cat",
+   "before": 2.81,
+   "after": 2.31,
+   "long": false
+  },
+  {
+   "variant": "K1-kala",
+   "line": "12-praise",
+   "before": 3.02,
+   "after": 2.77,
+   "long": false
+  },
+  {
+   "variant": "K1-kala",
+   "line": "13-sentence",
+   "before": 2.61,
+   "after": 2.37,
+   "long": false
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "01-ka",
+   "before": 0.44,
+   "after": 0.17,
+   "long": false
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "02-kha",
+   "before": 0.55,
+   "after": 0.25,
+   "long": false
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "03-ka-chant",
+   "before": 1.68,
+   "after": 1.55,
+   "long": false
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "04-kha-chant",
+   "before": 1.61,
+   "after": 1.45,
+   "long": false
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "05-jha-chant",
+   "before": 1.78,
+   "after": 1.55,
+   "long": false
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "06-nga",
+   "before": 0.45,
+   "after": 0.23,
+   "long": false
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "07-ksha",
+   "before": 0.44,
+   "after": 0.28,
+   "long": false
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "08-a-chant",
+   "before": 1.42,
+   "after": 1.25,
+   "long": false
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "09-number",
+   "before": 0.57,
+   "after": 0.33,
+   "long": false
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "10-word",
+   "before": 0.72,
+   "after": 0.61,
+   "long": false
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "11-cat",
+   "before": 3.19,
+   "after": 2.61,
+   "long": false
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "12-praise",
+   "before": 3.44,
+   "after": 3.13,
+   "long": false
+  },
+  {
+   "variant": "K2-kala-slower",
+   "line": "13-sentence",
+   "before": 2.98,
+   "after": 2.71,
+   "long": false
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "01-ka",
+   "before": 0.45,
+   "after": 0.33,
+   "long": false
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "02-kha",
+   "before": 0.48,
+   "after": 0.37,
+   "long": false
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "03-ka-chant",
+   "before": 1.68,
+   "after": 1.63,
+   "long": false
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "04-kha-chant",
+   "before": 1.53,
+   "after": 1.47,
+   "long": false
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "05-jha-chant",
+   "before": 1.77,
+   "after": 1.59,
+   "long": false
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "06-nga",
+   "before": 0.51,
+   "after": 0.35,
+   "long": false
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "07-ksha",
+   "before": 0.53,
+   "after": 0.43,
+   "long": false
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "08-a-chant",
+   "before": 1.38,
+   "after": 1.25,
+   "long": false
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "09-number",
+   "before": 0.57,
+   "after": 0.35,
+   "long": false
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "10-word",
+   "before": 0.77,
+   "after": 0.71,
+   "long": false
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "11-cat",
+   "before": 2.97,
+   "after": 2.63,
+   "long": false
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "12-praise",
+   "before": 3.29,
+   "after": 3.09,
+   "long": false
+  },
+  {
+   "variant": "K3-barsha",
+   "line": "13-sentence",
+   "before": 2.97,
+   "after": 2.73,
+   "long": false
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "08-a-chant",
+   "before": 6.04,
+   "after": 5.77,
+   "long": true
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "09-number",
+   "before": 1.56,
+   "after": 1.47,
+   "long": false
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "10-word",
+   "before": 0.84,
+   "after": 0.77,
+   "long": false
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "11-cat",
+   "before": 3.4,
+   "after": 3.4,
+   "long": false
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "01-ka",
+   "before": 0.39,
+   "after": 0.36,
+   "long": false
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "02-kha",
+   "before": 0.52,
+   "after": 0.52,
+   "long": false
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "03-ka-chant",
+   "before": 1.52,
+   "after": 1.44,
+   "long": false
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "04-kha-chant",
+   "before": 1.24,
+   "after": 1.16,
+   "long": false
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "05-jha-chant",
+   "before": 1.36,
+   "after": 1.29,
+   "long": false
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "06-nga",
+   "before": 0.27,
+   "after": 0.22,
+   "long": false
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "07-ksha",
+   "before": 0.5,
+   "after": 0.47,
+   "long": false
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "08-a-chant",
+   "before": 1.17,
+   "after": 1.14,
+   "long": false
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "09-number",
+   "before": 0.45,
+   "after": 0.45,
+   "long": false
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "10-word",
+   "before": 0.78,
+   "after": 0.77,
+   "long": false
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "11-cat",
+   "before": 2.71,
+   "after": 2.68,
+   "long": false
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "12-praise",
+   "before": 3,
+   "after": 2.91,
+   "long": false
+  },
+  {
+   "variant": "P1-piper-0",
+   "line": "13-sentence",
+   "before": 2.8,
+   "after": 2.77,
+   "long": false
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "01-ka",
+   "before": 0.35,
+   "after": 0.32,
+   "long": false
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "02-kha",
+   "before": 0.37,
+   "after": 0.36,
+   "long": false
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "03-ka-chant",
+   "before": 1.5,
+   "after": 1.48,
+   "long": false
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "04-kha-chant",
+   "before": 1.35,
+   "after": 1.31,
+   "long": false
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "05-jha-chant",
+   "before": 1.29,
+   "after": 1.26,
+   "long": false
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "06-nga",
+   "before": 0.2,
+   "after": 0.19,
+   "long": false
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "07-ksha",
+   "before": 0.33,
+   "after": 0.33,
+   "long": false
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "08-a-chant",
+   "before": 1.24,
+   "after": 1.21,
+   "long": false
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "09-number",
+   "before": 0.43,
+   "after": 0.43,
+   "long": false
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "10-word",
+   "before": 0.71,
+   "after": 0.67,
+   "long": false
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "11-cat",
+   "before": 2.39,
+   "after": 2.36,
+   "long": false
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "12-praise",
+   "before": 2.69,
+   "after": 2.68,
+   "long": false
+  },
+  {
+   "variant": "P2-piper-5",
+   "line": "13-sentence",
+   "before": 2.74,
+   "after": 2.71,
+   "long": false
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "01-ka",
+   "before": 0.81,
+   "after": 0.51,
+   "long": false
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "02-kha",
+   "before": 0.86,
+   "after": 0.59,
+   "long": false
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "03-ka-chant",
+   "before": 1.64,
+   "after": 1.29,
+   "long": false
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "04-kha-chant",
+   "before": 1.61,
+   "after": 1.29,
+   "long": false
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "05-jha-chant",
+   "before": 1.64,
+   "after": 1.27,
+   "long": false
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "06-nga",
+   "before": 1.01,
+   "after": 0.69,
+   "long": false
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "07-ksha",
+   "before": 0.88,
+   "after": 0.57,
+   "long": false
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "08-a-chant",
+   "before": 1.34,
+   "after": 0.95,
+   "long": false
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "09-number",
+   "before": 0.88,
+   "after": 0.61,
+   "long": false
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "10-word",
+   "before": 1.02,
+   "after": 0.61,
+   "long": false
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "11-cat",
+   "before": 3.55,
+   "after": 3.21,
+   "long": false
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "12-praise",
+   "before": 3.51,
+   "after": 3.19,
+   "long": false
+  },
+  {
+   "variant": "P3-chitwan",
+   "line": "13-sentence",
+   "before": 2.8,
+   "after": 2.43,
+   "long": false
+  }
+ ]
+}

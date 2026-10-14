@@ -1,0 +1,91 @@
+{
+ "engine": "chatterbox",
+ "variants": [
+  {
+   "id": "N1-chatterbox",
+   "desc": "Chatterbox, Nepali fine-tune, voice copied from kala-tts",
+   "licence": "MIT"
+  }
+ ],
+ "report": [
+  {
+   "variant": "N1-chatterbox",
+   "line": "01-ka",
+   "ok": false,
+   "error": "IndexError: max(): Expected reduction dim 1 to have non-zero size."
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "02-kha",
+   "ok": false,
+   "error": "IndexError: max(): Expected reduction dim 1 to have non-zero size."
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "03-ka-chant",
+   "ok": false,
+   "error": "IndexError: index out of range in self"
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "04-kha-chant",
+   "ok": false,
+   "error": "IndexError: index out of range in self"
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "05-jha-chant",
+   "ok": false,
+   "error": "IndexError: index out of range in self"
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "06-nga",
+   "ok": false,
+   "error": "IndexError: max(): Expected reduction dim 1 to have non-zero size."
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "07-ksha",
+   "ok": false,
+   "error": "IndexError: index out of range in self"
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "08-a-chant",
+   "ok": true,
+   "secs": 27.9
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "09-number",
+   "ok": true,
+   "secs": 10.27
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "10-word",
+   "ok": true,
+   "secs": 7.53
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "11-cat",
+   "ok": true,
+   "secs": 16.99
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "12-praise",
+   "ok": false,
+   "error": "IndexError: index out of range in self"
+  },
+  {
+   "variant": "N1-chatterbox",
+   "line": "13-sentence",
+   "ok": false,
+   "error": "IndexError: index out of range in self"
+  }
+ ],
+ "load_errors": []
+}
