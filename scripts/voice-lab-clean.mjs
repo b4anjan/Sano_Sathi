@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Voice lab: clean every lab/<variant>/<line>.wav exactly as the app's clips are cleaned
- * (voice-tidy.mjs, one steady volume, one 64k MP3), measure each, and merge the engines'
- * notes into lab/lab.json. Used by the open-source round (voice-lab-open.yml).
+ * Voice lab: clean every lab/<variant>/<line>.wav (or <line>.raw.wav / .raw.mp3) exactly as
+ * the app's clips are cleaned (voice-tidy.mjs, one steady volume, one 64k MP3), measure each,
+ * and merge the engines' notes into lab/lab.json. Used by the open-source and cloud rounds.
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -13,12 +13,13 @@ import { maxSeconds } from './voice-ssml.mjs';
 const LAB = 'lab';
 const RATE = 24000;
 const PCM = ['-f', 's16le', '-ar', String(RATE), '-ac', '1'];
-const engines = readdirSync(LAB).filter((f) => f.endsWith('.json') && f !== 'lab.json').map((f) => JSON.parse(readFileSync(join(LAB, f), 'utf8')));
+const engines = readdirSync(LAB).filter((f) => f.endsWith('.json') && !['lab.json', 'eleven-nepali-library.json'].includes(f)).map((f) => JSON.parse(readFileSync(join(LAB, f), 'utf8')));
 const linesText = Object.fromEntries(
   [
     ['01-ka', 'क'], ['02-kha', 'ख'], ['03-ka-chant', 'क, कुखुराको क'], ['04-kha-chant', 'ख, खेतको ख'], ['05-jha-chant', 'झ, झण्डाको झ'],
     ['06-nga', 'ङ'], ['07-ksha', 'क्ष'], ['08-a-chant', 'अ, अनारको अ'], ['09-number', 'सात'], ['10-word', 'पहेँलो'],
     ['11-cat', 'म्याउँ! म बिरालो। आऊ, खेलौँ!'], ['12-praise', 'नीलो! स्याबास! ठीक डालोमा राख्यौ!'], ['13-sentence', 'राति भयो। चाँडै सुत्ने बेला भयो!'],
+    ['14-english', "Blue! Great job! That's the right basket!"],
   ],
 );
 
@@ -26,8 +27,8 @@ const measured = [];
 for (const v of readdirSync(LAB)) {
   const dir = join(LAB, v);
   if (!statSync(dir).isDirectory()) continue;
-  for (const f of readdirSync(dir).filter((x) => x.endsWith('.wav'))) {
-    const line = f.replace(/\.wav$/, '');
+  for (const f of readdirSync(dir).filter((x) => /(\.raw\.(wav|mp3)|\.wav)$/.test(x))) {
+    const line = f.replace(/(\.raw)?\.(wav|mp3)$/, '');
     const src = join(dir, f);
     const dec = spawnSync('ffmpeg', ['-loglevel', 'error', '-i', src, ...PCM, '-'], { maxBuffer: 1 << 27 });
     if (dec.status !== 0 || !dec.stdout.length) continue;
