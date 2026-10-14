@@ -12,7 +12,7 @@ permissions:
 jobs:
   lab:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -30,18 +30,26 @@ jobs:
           # A short kala-tts sentence, for OmniVoice to copy the voice from.
           python -c "import kala_tts; kala_tts.synthesize_to_file('नमस्ते! म तिम्रो साथी हुँ। आज हामी सँगै खेलौँ र सिकौँ।', '/tmp/ref.wav')"
 
-      - name: PyTorch voices (OmniVoice Nepali, Meta MMS), on the CPU
+      - name: OmniVoice (PyTorch, on the CPU)
         continue-on-error: true
         env:
           CLONE_REF: /tmp/ref.wav
           CLONE_TEXT: नमस्ते! म तिम्रो साथी हुँ। आज हामी सँगै खेलौँ र सिकौँ।
         run: |
           python3 -m venv /tmp/torch && . /tmp/torch/bin/activate
-          mkdir -p lab
-          pip install -q torch torchaudio --index-url https://download.pytorch.org/whl/cpu > lab/pip-torch.log 2>&1
-          pip install -q omnivoice uroman >> lab/pip-torch.log 2>&1 || true
-          pip list 2>/dev/null | grep -iE "^(torch|transformers|omnivoice|accelerate|uroman) " >> lab/pip-torch.log
-          python scripts/voice-lab-open.py torch 2>&1 | tail -150 > lab/torch.log
+          pip install -q torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+          pip install -q omnivoice
+          python scripts/voice-lab-open.py torch
+
+      - name: Chatterbox Nepali (PyTorch, on the CPU)
+        continue-on-error: true
+        env:
+          CLONE_REF: /tmp/ref.wav
+        run: |
+          python3 -m venv /tmp/cb && . /tmp/cb/bin/activate
+          pip install -q torch==2.6.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+          pip install -q chatterbox-tts
+          python scripts/voice-lab-open.py chatterbox
 
       - name: Clean every clip the way the app does
         run: node scripts/voice-lab-clean.mjs

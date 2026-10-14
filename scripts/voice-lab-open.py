@@ -5,7 +5,8 @@ with free, open-source voices that run on our own machine, to compare by ear wit
 ElevenLabs. Run by .github/workflows/voice-lab-open.yml, one engine per Python environment:
 
     python scripts/voice-lab-open.py light   # kala-tts and Piper (small, CPU)
-    python scripts/voice-lab-open.py torch   # OmniVoice Nepali and Meta MMS (PyTorch, CPU)
+    python scripts/voice-lab-open.py torch        # OmniVoice (PyTorch, CPU)
+    python scripts/voice-lab-open.py chatterbox   # Chatterbox Nepali fine-tune (PyTorch, CPU)
 
 Writes lab/<variant>/<line>.wav and lab/<engine>.json (what each variant is, timings, errors).
 scripts/voice-lab-clean.mjs then cleans every clip exactly as the app's clips are cleaned.
@@ -142,12 +143,13 @@ def torch_engines():
 
     torch.set_num_threads(os.cpu_count() or 4)
     variants = []
-    # OmniVoice fine-tuned on ~45 h of native Nepali speech (WiseYak). Two ways to choose a voice:
+    # OmniVoice (k2-fsa; Nepali is one of its 600+ languages). Two ways to choose a voice:
     # "design" (describe it: female, child, male…) and "clone" (copy a voice from a short clip).
+    # (The WiseYak Nepali fine-tune is no longer public.)
     try:
         from omnivoice import OmniVoice
 
-        model = OmniVoice.from_pretrained("mlwiseyak/omnivoice-nepali-tts-v2", device_map="cpu", dtype=torch.float32)
+        model = OmniVoice.from_pretrained("k2-fsa/OmniVoice", device_map="cpu", dtype=torch.float32)
 
         def omni(**voice):
             def synth(text):
@@ -156,42 +158,51 @@ def torch_engines():
 
             return synth
 
-        lic = "Apache 2.0 fine-tune of a CC BY-NC base (non-commercial)"
+        lic = "Code Apache 2.0, model CC BY-NC (non-commercial)"
         variants += [
-            ("O1-omni-woman", "OmniVoice Nepali, designed: female, young adult", lic, omni(instruct="female, young adult, moderate pitch")),
-            ("O2-omni-child", "OmniVoice Nepali, designed: female, child", lic, omni(instruct="female, child, high pitch")),
-            ("O3-omni-man", "OmniVoice Nepali, designed: male, young adult", lic, omni(instruct="male, young adult, moderate pitch")),
+            ("O1-omni-woman", "OmniVoice, designed: female, young adult", lic, omni(instruct="female, young adult, moderate pitch")),
+            ("O2-omni-child", "OmniVoice, designed: female, child", lic, omni(instruct="female, child, high pitch")),
+            ("O3-omni-man", "OmniVoice, designed: male, young adult", lic, omni(instruct="male, young adult, moderate pitch")),
         ]
         ref = os.environ.get("CLONE_REF")
         if ref and os.path.exists(ref):
-            variants.append(("O4-omni-clone", "OmniVoice Nepali, voice copied from kala-tts", lic, omni(ref_audio=ref, ref_text=os.environ.get("CLONE_TEXT", ""))))
+            variants.append(("O4-omni-clone", "OmniVoice, voice copied from kala-tts", lic, omni(ref_audio=ref, ref_text=os.environ.get("CLONE_TEXT", ""))))
     except Exception:
         load_error("omnivoice")
-
-    # Meta MMS: one Nepali voice among 1,100 languages.
-    try:
-        from transformers import AutoTokenizer, VitsModel
-
-        tok = AutoTokenizer.from_pretrained("facebook/mms-tts-npi")
-        mms = VitsModel.from_pretrained("facebook/mms-tts-npi")
-        roman = None
-        if getattr(tok, "is_uroman", False):
-            import uroman
-
-            roman = uroman.Uroman()
-
-        def mms_synth(text):
-            t = roman.romanize_string(text) if roman else text
-            with torch.no_grad():
-                wav = mms(**tok(t, return_tensors="pt")).waveform
-            return wav.numpy().squeeze(), mms.config.sampling_rate
-
-        variants.append(("M1-mms", "Meta MMS Nepali", "CC BY-NC 4.0 (non-commercial)", mms_synth))
-    except Exception:
-        load_error("mms")
     run("torch", variants)
+
+
+def chatterbox():
+    import numpy as np
+    import torch
+
+    torch.set_num_threads(os.cpu_count() or 4)
+    variants = []
+    # Chatterbox Multilingual (Resemble AI, MIT) with a community fine-tune for Nepali (MIT):
+    # the fine-tuned "T3" part replaces the original. It copies a voice from a short clip.
+    try:
+        from chatterbox.mtl_tts import ChatterboxMultilingualTTS
+        from huggingface_hub import hf_hub_download
+        from safetensors.torch import load_file
+
+        tts = ChatterboxMultilingualTTS.from_pretrained(device="cpu")
+        state = load_file(hf_hub_download("waglesameer5/chatterbox-nepali", "t3_mtl_nepali_final.safetensors"))
+        if "model" in state:
+            state = state["model"][0]
+        missing, unexpected = tts.t3.load_state_dict(state, strict=False)
+        print("chatterbox nepali weights: missing", len(missing), "unexpected", len(unexpected), flush=True)
+        ref = os.environ.get("CLONE_REF")
+
+        def cb(text):
+            wav = tts.generate(text, language_id="hi", audio_prompt_path=ref)
+            return wav.squeeze().numpy(), tts.sr
+
+        variants.append(("N1-chatterbox", "Chatterbox, Nepali fine-tune, voice copied from kala-tts", "MIT", cb))
+    except Exception:
+        load_error("chatterbox")
+    run("chatterbox", variants)
 
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    {"light": light, "torch": torch_engines}[sys.argv[1]]()
+    {"light": light, "torch": torch_engines, "chatterbox": chatterbox}[sys.argv[1]]()
