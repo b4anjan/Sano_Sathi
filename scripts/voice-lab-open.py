@@ -49,9 +49,18 @@ def write_wav(path, samples, rate):
         w.writeframes(a.tobytes())
 
 
+LOAD_ERRORS = []
+
+
+def load_error(what):
+    """Remember why an engine could not load (the CI log is not always readable)."""
+    LOAD_ERRORS.append({"engine": what, "error": traceback.format_exc()[-1500:]})
+    traceback.print_exc()
+
+
 def run(engine_name, variants):
     """variants: list of (id, description, licence, synth(text) -> (samples, rate))."""
-    info = {"engine": engine_name, "variants": [], "report": []}
+    info = {"engine": engine_name, "variants": [], "report": [], "load_errors": LOAD_ERRORS}
     for vid, desc, licence, synth in variants:
         os.makedirs(os.path.join(OUT, vid), exist_ok=True)
         info["variants"].append({"id": vid, "desc": desc, "licence": licence})
@@ -94,7 +103,7 @@ def light():
             ("K3-barsha", "kala-tts, speaker barsha", "MIT code, CC BY-SA 4.0 voice", kala("barsha")),
         ]
     except Exception:
-        traceback.print_exc()
+        load_error("kala-tts")
 
     # Piper: the Nepali voice trained on Google's Nepali recordings (OpenSLR 43), via eSpeak.
     try:
@@ -123,7 +132,7 @@ def light():
             ("P2-piper-5", "Piper Nepali (Google recordings), speaker 5", "CC BY-SA 4.0 voice", piper(5)),
         ]
     except Exception:
-        traceback.print_exc()
+        load_error("piper")
     run("light", variants)
 
 
@@ -157,7 +166,7 @@ def torch_engines():
         if ref and os.path.exists(ref):
             variants.append(("O4-omni-clone", "OmniVoice Nepali, voice copied from kala-tts", lic, omni(ref_audio=ref, ref_text=os.environ.get("CLONE_TEXT", ""))))
     except Exception:
-        traceback.print_exc()
+        load_error("omnivoice")
 
     # Meta MMS: one Nepali voice among 1,100 languages.
     try:
@@ -179,7 +188,7 @@ def torch_engines():
 
         variants.append(("M1-mms", "Meta MMS Nepali", "CC BY-NC 4.0 (non-commercial)", mms_synth))
     except Exception:
-        traceback.print_exc()
+        load_error("mms")
     run("torch", variants)
 
 

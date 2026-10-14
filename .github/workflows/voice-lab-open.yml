@@ -37,9 +37,11 @@ jobs:
           CLONE_TEXT: नमस्ते! म तिम्रो साथी हुँ। आज हामी सँगै खेलौँ र सिकौँ।
         run: |
           python3 -m venv /tmp/torch && . /tmp/torch/bin/activate
-          pip install -q torch torchaudio --index-url https://download.pytorch.org/whl/cpu
-          pip install -q omnivoice uroman
-          python scripts/voice-lab-open.py torch
+          mkdir -p lab
+          pip install -q torch torchaudio --index-url https://download.pytorch.org/whl/cpu > lab/pip-torch.log 2>&1
+          pip install -q omnivoice uroman >> lab/pip-torch.log 2>&1 || true
+          pip list 2>/dev/null | grep -iE "^(torch|transformers|omnivoice|accelerate|uroman) " >> lab/pip-torch.log
+          python scripts/voice-lab-open.py torch 2>&1 | tail -150 > lab/torch.log
 
       - name: Clean every clip the way the app does
         run: node scripts/voice-lab-clean.mjs
