@@ -1,0 +1,55 @@
+# Voice lab, open-source round: free voices that run on our own machine (no account, no key),
+# tried on the hardest Nepali lines. Results go to the "voice-lab" branch (not to the website).
+#   GitHub > Actions > "Voice lab (open source)" > Run workflow.
+name: Voice lab (open source)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+      - name: Make sure ffmpeg is installed
+        run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+
+      - name: Small Nepali voices (kala-tts, Piper)
+        continue-on-error: true
+        run: |
+          python3 -m venv /tmp/light && . /tmp/light/bin/activate
+          pip install -q kala-tts piper-tts huggingface_hub numpy
+          python scripts/voice-lab-open.py light
+          # A short kala-tts sentence, for OmniVoice to copy the voice from.
+          python -c "import kala_tts; kala_tts.synthesize_to_file('नमस्ते! म तिम्रो साथी हुँ। आज हामी सँगै खेलौँ र सिकौँ।', '/tmp/ref.wav')"
+
+      - name: PyTorch voices (OmniVoice Nepali, Meta MMS), on the CPU
+        continue-on-error: true
+        env:
+          CLONE_REF: /tmp/ref.wav
+          CLONE_TEXT: नमस्ते! म तिम्रो साथी हुँ। आज हामी सँगै खेलौँ र सिकौँ।
+        run: |
+          python3 -m venv /tmp/torch && . /tmp/torch/bin/activate
+          pip install -q torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+          pip install -q omnivoice uroman
+          python scripts/voice-lab-open.py torch
+
+      - name: Clean every clip the way the app does
+        run: node scripts/voice-lab-clean.mjs
+
+      - name: Publish them to the voice-lab branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q --orphan voice-lab
+          git rm -rq --cached . >/dev/null
+          git add lab
+          git commit -q -m "Voice lab samples (open source)"
+          git push -q -f origin voice-lab
