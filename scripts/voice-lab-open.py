@@ -134,6 +134,29 @@ def light():
         ]
     except Exception:
         load_error("piper")
+
+    # Piper "chitwan": a male Nepali voice from a free (CC0) one-hour recording set.
+    try:
+        from huggingface_hub import hf_hub_download
+        from piper import PiperVoice
+
+        base = "ne/ne_NP/chitwan/medium/ne_NP-chitwan-medium.onnx"
+        model = hf_hub_download("rhasspy/piper-voices", base)
+        hf_hub_download("rhasspy/piper-voices", base + ".json")
+        chitwan = PiperVoice.load(model)
+
+        def chitwan_synth(text):
+            import numpy as np
+
+            path = "/tmp/chitwan.wav"
+            with wave.open(path, "wb") as w:
+                chitwan.synthesize_wav(text, w)
+            with wave.open(path) as w:
+                return np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16), w.getframerate()
+
+        variants.append(("P3-chitwan", "Piper Nepali, chitwan (male)", "CC0 recordings", chitwan_synth))
+    except Exception:
+        load_error("piper-chitwan")
     run("light", variants)
 
 
