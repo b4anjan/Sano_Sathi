@@ -5,6 +5,11 @@ name: Voice lab (open source)
 
 on:
   workflow_dispatch:
+    inputs:
+      engines:
+        description: Which voices to make (any of light, torch, chatterbox)
+        type: string
+        default: light torch chatterbox
 
 permissions:
   contents: write
@@ -31,6 +36,7 @@ jobs:
           python -c "import kala_tts; kala_tts.synthesize_to_file('नमस्ते! म तिम्रो साथी हुँ। आज हामी सँगै खेलौँ र सिकौँ।', '/tmp/ref.wav')"
 
       - name: OmniVoice (PyTorch, on the CPU)
+        if: contains(inputs.engines, 'torch')
         continue-on-error: true
         env:
           CLONE_REF: /tmp/ref.wav
@@ -42,6 +48,7 @@ jobs:
           python scripts/voice-lab-open.py torch
 
       - name: Chatterbox Nepali (PyTorch, on the CPU)
+        if: contains(inputs.engines, 'chatterbox')
         continue-on-error: true
         env:
           CLONE_REF: /tmp/ref.wav

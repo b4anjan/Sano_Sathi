@@ -212,7 +212,13 @@ def chatterbox():
         state = load_file(hf_hub_download("waglesameer5/chatterbox-nepali", "t3_mtl_nepali_final.safetensors"))
         if "model" in state:
             state = state["model"][0]
+        # The fine-tune added one text token (for Nepali), so grow the text layers to match.
+        n, dim = state["text_emb.weight"].shape
+        if tts.t3.text_emb.weight.shape[0] != n:
+            tts.t3.text_emb = torch.nn.Embedding(n, dim)
+            tts.t3.text_head = torch.nn.Linear(state["text_head.weight"].shape[1], n, bias=False)
         missing, unexpected = tts.t3.load_state_dict(state, strict=False)
+        tts.t3.to("cpu").eval()
         print("chatterbox nepali weights: missing", len(missing), "unexpected", len(unexpected), flush=True)
         ref = os.environ.get("CLONE_REF")
 
