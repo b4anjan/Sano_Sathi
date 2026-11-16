@@ -1,5 +1,5 @@
 # Little Friend · सानो साथी (Sano Sathi)
-
+https://b4anjan.github.io/Sano_Sathi/
 A bilingual English–Nepali learning playground for ages 2–8. English speakers see the name
 "Little Friend"; the Nepali name is सानो साथी (Sano Sathi, the repository name). One TypeScript codebase:
 the website now, and the iPhone, iPad and Android apps later (wrapped with Capacitor).
